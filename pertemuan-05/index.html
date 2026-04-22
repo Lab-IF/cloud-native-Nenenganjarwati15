@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertemuan 5 - Docker Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+        .nav { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); padding: 15px 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1e293b; }
+        .nav-content { max-width: 1000px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
+        .nav a:hover { color: #3b82f6; }
+        .nav-title { font-weight: 600; color: #f1f5f9; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 50px; padding: 40px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(0, 212, 255, 0.1)); border-radius: 20px; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .header-badge { display: inline-block; background: #3b82f6; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 20px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(90deg, #3b82f6, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: #94a3b8; font-size: 1.1rem; }
+        .section { margin-bottom: 40px; }
+        .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; margin-bottom: 20px; color: #f1f5f9; }
+        .section-title i { color: #3b82f6; }
+        .card { background: #1e293b; border-radius: 15px; padding: 25px; margin-bottom: 20px; border: 1px solid #334155; }
+        .card h3 { color: #f1f5f9; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .card h3 i { color: #3b82f6; }
+        .objectives { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .objective-item { background: rgba(59, 130, 246, 0.1); padding: 15px 20px; border-radius: 10px; border-left: 3px solid #3b82f6; display: flex; align-items: center; gap: 12px; }
+        .objective-item i { color: #3b82f6; }
+        .code-block { background: #0f172a; border-radius: 12px; overflow: hidden; margin: 20px 0; border: 1px solid #334155; }
+        .code-header { background: #1e293b; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .code-header span { color: #94a3b8; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .code-header button { background: #334155; border: none; color: #94a3b8; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s; }
+        .code-header button:hover { background: #3b82f6; color: white; }
+        .code-content { padding: 20px; overflow-x: auto; }
+        .code-content pre { font-family: 'Fira Code', monospace; font-size: 0.9rem; color: #e2e8f0; margin: 0; }
+        .code-content .comment { color: #6b7280; }
+        .code-content .command { color: #3b82f6; }
+        .code-content .keyword { color: #f59e0b; }
+        .code-content .string { color: #10b981; }
+        .diagram { background: #0f172a; border-radius: 12px; padding: 30px; margin: 20px 0; border: 1px solid #334155; text-align: center; overflow-x: auto; }
+        .diagram pre { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #94a3b8; display: inline-block; text-align: left; }
+        .info-box { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .info-box.warning { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+        .info-box.success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
+        .info-box h4 { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: #3b82f6; }
+        .info-box.warning h4 { color: #f59e0b; }
+        .info-box.success h4 { color: #10b981; }
+        .steps { counter-reset: step-counter; }
+        .step { position: relative; padding-left: 60px; margin-bottom: 30px; }
+        .step::before { counter-increment: step-counter; content: counter(step-counter); position: absolute; left: 0; top: 0; width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #00d4ff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; }
+        .step h4 { color: #f1f5f9; margin-bottom: 10px; }
+        .task-card { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(0, 212, 255, 0.1)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 15px; padding: 25px; margin: 20px 0; }
+        .task-card h4 { color: #3b82f6; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .task-points { background: #3b82f6; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; }
+        .footer-nav { display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1e293b; }
+        .footer-nav a { display: flex; align-items: center; gap: 10px; color: #94a3b8; text-decoration: none; padding: 15px 25px; background: #1e293b; border-radius: 10px; transition: all 0.3s; }
+        .footer-nav a:hover { background: #3b82f6; color: white; }
+        @media (max-width: 768px) { .header h1 { font-size: 1.8rem; } .step { padding-left: 50px; } }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="../pertemuan-04/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 4</a>
+            <span class="nav-title">Pertemuan 5</span>
+            <a href="../pertemuan-06/index.html">Pertemuan 6 <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <span class="header-badge">Minggu 5</span>
+            <h1>☁️ Docker Hub</h1>
+            <p>Menyimpan dan berbagi Docker Image ke cloud registry</p>
+        </header>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-bullseye"></i> Tujuan Pembelajaran</h2>
+            <div class="objectives">
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Memahami apa itu Docker Hub</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Membuat akun Docker Hub</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Push image ke Docker Hub</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Pull image dari Docker Hub</span></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-book"></i> Teori</h2>
+
+            <div class="card">
+                <h3><i class="fas fa-cloud"></i> Apa itu Docker Hub?</h3>
+                <p>Docker Hub adalah <strong>cloud-based registry service</strong> untuk menyimpan dan berbagi Docker images.</p>
+                
+                <div class="diagram">
+                    <pre>
+┌──────────────────────────────────────────────────────────────────┐
+│                        Docker Hub                                │
+│                    (hub.docker.com)                              │
+│                                                                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │   nginx     │  │   mysql     │  │  python     │  Official    │
+│  │   latest    │  │   8.0       │  │  3.11       │  Images      │
+│  └─────────────┘  └─────────────┘  └─────────────┘              │
+│                                                                  │
+│  ┌─────────────┐  ┌─────────────┐                               │
+│  │ username/   │  │ username/   │  Your Images                  │
+│  │ my-app:1.0  │  │ my-web:v2   │  (Repository Anda)            │
+│  └─────────────┘  └─────────────┘                               │
+└──────────────────────────────────────────────────────────────────┘
+                         ↑         ↓
+                       push      pull
+                         ↑         ↓
+                    ┌─────────────────┐
+                    │  Komputer Lokal │
+                    │  docker images  │
+                    └─────────────────┘
+                    </pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-tags"></i> Naming Convention</h3>
+                <div class="info-box">
+                    <h4><i class="fas fa-info-circle"></i> Format Nama Image</h4>
+                    <p><code>[username]/[repository-name]:[tag]</code></p>
+                    <p style="margin-top: 10px;">Contoh:</p>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li><code>budiman/my-flask-app:1.0</code></li>
+                        <li><code>budiman/my-flask-app:latest</code></li>
+                        <li><code>budiman/my-flask-app:v2</code></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-laptop-code"></i> Praktikum</h2>
+
+            <div class="card">
+                <h3><i class="fas fa-user-plus"></i> Praktik 1: Buat Akun Docker Hub</h3>
+                <div class="steps">
+                    <div class="step">
+                        <h4>Daftar di Docker Hub</h4>
+                        <p>Buka <a href="https://hub.docker.com" style="color: #3b82f6;">https://hub.docker.com</a> dan buat akun gratis</p>
+                    </div>
+                    <div class="step">
+                        <h4>Login dari Terminal</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="command">docker</span> login
+
+<span class="comment"># Masukkan username dan password Docker Hub</span></pre></div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <h4>Verifikasi Login</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="comment"># Cek kredensial tersimpan</span>
+<span class="command">cat</span> ~/.docker/config.json</pre></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-cloud-upload-alt"></i> Praktik 2: Push Image ke Docker Hub</h3>
+                <div class="steps">
+                    <div class="step">
+                        <h4>Buat aplikasi sederhana</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fab fa-python"></i> app.py</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="keyword">from</span> flask <span class="keyword">import</span> Flask
+
+app = Flask(__name__)
+
+<span class="keyword">@app.route</span>(<span class="string">'/'</span>)
+<span class="keyword">def</span> home():
+    <span class="keyword">return</span> <span class="string">'''
+    &lt;h1&gt;🚀 Halo dari Docker Hub!&lt;/h1&gt;
+    &lt;p&gt;Nama: [Nama Anda]&lt;/p&gt;
+    &lt;p&gt;NIM: [NIM Anda]&lt;/p&gt;
+    &lt;p&gt;Image: [username]/flask-app:1.0&lt;/p&gt;
+    '''</span>
+
+<span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:
+    app.run(host=<span class="string">'0.0.0.0'</span>, port=5000)</pre></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <h4>Buat Dockerfile</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fab fa-docker"></i> Dockerfile</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="keyword">FROM</span> python:3.11-slim
+<span class="keyword">WORKDIR</span> /app
+<span class="keyword">RUN</span> pip install flask
+<span class="keyword">COPY</span> app.py .
+<span class="keyword">EXPOSE</span> 5000
+<span class="keyword">CMD</span> [<span class="string">"python"</span>, <span class="string">"app.py"</span>]</pre></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <h4>Build dengan nama yang benar</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="comment"># Ganti [username] dengan username Docker Hub Anda</span>
+<span class="command">docker</span> build <span class="keyword">-t</span> [username]/flask-app:1.0 .
+
+<span class="comment"># Contoh:</span>
+<span class="command">docker</span> build <span class="keyword">-t</span> budiman/flask-app:1.0 .</pre></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <h4>Push ke Docker Hub</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="command">docker</span> push [username]/flask-app:1.0
+
+<span class="comment"># Contoh:</span>
+<span class="command">docker</span> push budiman/flask-app:1.0</pre></div>
+                        </div>
+                        <div class="info-box success">
+                            <h4><i class="fas fa-check-circle"></i> Berhasil!</h4>
+                            <p>Image sekarang ada di Docker Hub! Buka <code>hub.docker.com/r/[username]/flask-app</code></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-cloud-download-alt"></i> Praktik 3: Pull Image dari Docker Hub</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Hapus image lokal dulu (simulasi di komputer lain)</span>
+<span class="command">docker</span> rmi [username]/flask-app:1.0
+
+<span class="comment"># Pull dari Docker Hub</span>
+<span class="command">docker</span> pull [username]/flask-app:1.0
+
+<span class="comment"># Jalankan</span>
+<span class="command">docker</span> run <span class="keyword">-d</span> <span class="keyword">-p</span> 5000:5000 [username]/flask-app:1.0</pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-sync-alt"></i> Praktik 4: Update dan Versioning</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Update app.py dengan fitur baru...</span>
+
+<span class="comment"># Build versi baru</span>
+<span class="command">docker</span> build <span class="keyword">-t</span> [username]/flask-app:2.0 .
+
+<span class="comment"># Push versi baru</span>
+<span class="command">docker</span> push [username]/flask-app:2.0
+
+<span class="comment"># Tag sebagai latest</span>
+<span class="command">docker</span> tag [username]/flask-app:2.0 [username]/flask-app:latest
+<span class="command">docker</span> push [username]/flask-app:latest</pre></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-tasks"></i> Tugas Praktikum</h2>
+
+            <div class="task-card">
+                <h4><i class="fas fa-clipboard-check"></i> Tugas: Publish Aplikasi ke Docker Hub <span class="task-points">100 poin</span></h4>
+                <ol style="margin: 15px 0; padding-left: 20px;">
+                    <li>Buat akun Docker Hub (jika belum punya)</li>
+                    <li>Buat aplikasi Flask dengan fitur:
+                        <ul>
+                            <li>Halaman biodata (<code>/</code>)</li>
+                            <li>Halaman timestamp (<code>/waktu</code>) menampilkan waktu sekarang</li>
+                        </ul>
+                    </li>
+                    <li>Build image dengan nama: <code>[dockerhub-username]/biodata-[nim]:1.0</code></li>
+                    <li>Push ke Docker Hub</li>
+                    <li>Screenshot halaman repository di Docker Hub</li>
+                    <li>Berikan link Docker Hub ke dosen</li>
+                </ol>
+            </div>
+
+            <div class="info-box warning">
+                <h4><i class="fas fa-exclamation-triangle"></i> Penting</h4>
+                <p>Jangan lupa <code>docker logout</code> setelah selesai jika menggunakan komputer lab!</p>
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <a href="../pertemuan-04/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 4</a>
+            <a href="../pertemuan-06/index.html">Pertemuan 6 <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code);
+            button.textContent = 'Copied!';
+            setTimeout(() => button.textContent = 'Copy', 2000);
+        }
+    </script>
+</body>
+</html>

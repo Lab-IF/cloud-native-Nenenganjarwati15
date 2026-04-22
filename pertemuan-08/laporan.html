@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Laporan UTS - Pertemuan 8</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:100vh;padding:20px;color:#fff}.container{max-width:900px;margin:0 auto}h1{text-align:center;margin-bottom:10px}h1 span{color:#ffd700}.subtitle{text-align:center;color:#888;margin-bottom:30px}.card{background:rgba(255,255,255,0.05);border-radius:15px;padding:25px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1)}.card h2{color:#00d4ff;margin-bottom:20px}.card.uts{border-color:#ffd700}.card.uts h2{color:#ffd700}.form-group{margin-bottom:15px}label{display:block;margin-bottom:5px;color:#ccc;font-size:0.9rem}input[type="text"],input[type="date"],textarea{width:100%;padding:12px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;font-size:1rem;font-family:inherit}input:focus,textarea:focus{outline:none;border-color:#00d4ff}textarea{min-height:100px;resize:vertical}textarea.code{font-family:monospace;min-height:200px}.checkbox-group{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;margin-bottom:10px}.checkbox-group input{width:20px;height:20px}.checkbox-group label{margin:0;flex:1}.screenshot-item{background:rgba(0,0,0,0.2);padding:15px;border-radius:8px;margin-bottom:15px}.screenshot-item h4{color:#ffd700;margin-bottom:10px}input[type="file"]{width:100%;padding:10px;background:rgba(0,212,255,0.1);border:2px dashed rgba(0,212,255,0.5);border-radius:8px}.preview-img{max-width:100%;max-height:200px;border-radius:8px;margin-top:10px;display:none}.btn{padding:15px 30px;border:none;border-radius:8px;font-size:1rem;cursor:pointer}.btn-primary{background:linear-gradient(135deg,#ffd700,#ff9500);color:#000;font-weight:bold}.btn-secondary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2)}.buttons{display:flex;gap:15px;flex-wrap:wrap;justify-content:center;margin-top:30px}.preview-section{background:#0d1117;border-radius:10px;padding:20px;margin-top:20px;display:none}.preview-content{background:#161b22;padding:20px;border-radius:8px;white-space:pre-wrap;font-family:monospace;font-size:0.85rem;max-height:400px;overflow-y:auto;color:#c9d1d9}.info-box{background:rgba(255,215,0,0.1);border-left:4px solid #ffd700;padding:15px;margin-bottom:20px}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}.success-message{position:fixed;top:20px;right:20px;background:#00ff88;color:#000;padding:15px 25px;border-radius:10px;font-weight:bold;display:none;z-index:1000}.nav-link{text-align:center;margin-bottom:20px}.nav-link a{color:#00d4ff;text-decoration:none}.badge{display:inline-block;background:#ffd700;color:#000;padding:5px 15px;border-radius:20px;font-weight:bold;margin-bottom:20px}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-link"><a href="README.md">📖 Materi</a> | <a href="index.html">🌐 Web</a> | <a href="../index.html">🏠 Home</a></div>
+        <h1>📝 Form Laporan <span>UTS</span></h1>
+        <p class="subtitle">Project Todo List dengan Docker Compose</p>
+        <div style="text-align:center"><span class="badge">⭐ UJIAN TENGAH SEMESTER</span></div>
+        <div class="info-box"><p style="color:#ccc">💡 Isi form lengkap → Download LAPORAN.md → Simpan screenshot di folder <code>ss/</code></p></div>
+
+        <div class="card uts">
+            <h2>👤 Identitas Mahasiswa</h2>
+            <div class="row">
+                <div class="form-group"><label>Nama Lengkap *</label><input type="text" id="nama" placeholder="Budi Santoso"></div>
+                <div class="form-group"><label>NIM *</label><input type="text" id="nim" placeholder="12345678"></div>
+            </div>
+            <div class="row">
+                <div class="form-group"><label>Kelas *</label><input type="text" id="kelas" placeholder="TI-3A"></div>
+                <div class="form-group"><label>Tanggal Pengumpulan *</label><input type="date" id="tanggal"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>✅ Checklist Fitur</h2>
+            <div class="checkbox-group"><input type="checkbox" id="task1"><label>Docker Compose berjalan</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task2"><label>Flask + MySQL terhubung</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task3"><label><strong>Create</strong> - Tambah todo</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task4"><label><strong>Read</strong> - Lihat semua todos</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task5"><label><strong>Update</strong> - Toggle status</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task6"><label><strong>Delete</strong> - Hapus todo</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task7"><label>Data persistent (volume)</label></div>
+        </div>
+
+        <div class="card">
+            <h2>💻 Kode Program</h2>
+            <div class="form-group"><label>📄 docker-compose.yml</label><textarea id="kode_compose" class="code" placeholder="version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: todoapp
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  web:
+    build: ./app
+    ports:
+      - '5000:5000'
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+
+volumes:
+  db-data:"></textarea></div>
+
+            <div class="form-group"><label>🐳 app/Dockerfile</label><textarea id="kode_dockerfile" class="code" placeholder="FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD [&quot;python&quot;, &quot;app.py&quot;]"></textarea></div>
+
+            <div class="form-group"><label>📋 app/requirements.txt</label><textarea id="kode_req" placeholder="flask
+mysql-connector-python"></textarea></div>
+
+            <div class="form-group"><label>🐍 app/app.py</label><textarea id="kode_app" class="code" placeholder="from flask import Flask, render_template, request, redirect
+import mysql.connector
+
+app = Flask(__name__)
+
+def get_db():
+    return mysql.connector.connect(
+        host='db',
+        user='root',
+        password='root',
+        database='todoapp'
+    )
+
+@app.route('/')
+def index():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM todos')
+    todos = cursor.fetchall()
+    db.close()
+    return render_template('index.html', todos=todos)
+
+# ... tambahkan route lainnya"></textarea></div>
+
+            <div class="form-group"><label>🌐 app/templates/index.html</label><textarea id="kode_html" class="code" placeholder="<!DOCTYPE html>
+<html>
+<head><title>Todo App</title></head>
+<body>
+    <h1>Todo List</h1>
+    <form action=&quot;/add&quot; method=&quot;POST&quot;>
+        <input name=&quot;task&quot; placeholder=&quot;New task&quot;>
+        <button>Add</button>
+    </form>
+    <ul>
+    {% for todo in todos %}
+        <li>{{ todo.task }}</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>"></textarea></div>
+
+            <div class="form-group"><label>🗃️ init.sql</label><textarea id="kode_sql" class="code" placeholder="CREATE TABLE IF NOT EXISTS todos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    task VARCHAR(255) NOT NULL,
+    done BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);"></textarea></div>
+        </div>
+
+        <div class="card">
+            <h2>🖼️ Screenshot</h2>
+            <div class="screenshot-item"><h4>1️⃣ Struktur Folder Project</h4><input type="file" id="ss1" accept="image/*" onchange="previewImg(this,'p1')"><img id="p1" class="preview-img"></div>
+            <div class="screenshot-item"><h4>2️⃣ Docker Compose Up</h4><input type="file" id="ss2" accept="image/*" onchange="previewImg(this,'p2')"><img id="p2" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Output:</label><textarea id="out_up" placeholder="Creating network...
+Creating db-1...
+Creating web-1..."></textarea></div></div>
+            <div class="screenshot-item"><h4>3️⃣ Docker Compose PS</h4><input type="file" id="ss3" accept="image/*" onchange="previewImg(this,'p3')"><img id="p3" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Output:</label><textarea id="out_ps" placeholder="NAME   SERVICE   STATUS    PORTS
+db-1   db        running   3306
+web-1  web       running   0.0.0.0:5000->5000"></textarea></div></div>
+            <div class="screenshot-item"><h4>4️⃣ Tampilan Awal Aplikasi</h4><input type="file" id="ss4" accept="image/*" onchange="previewImg(this,'p4')"><img id="p4" class="preview-img"></div>
+            <div class="screenshot-item"><h4>5️⃣ Fitur CREATE (Tambah Todo)</h4><input type="file" id="ss5" accept="image/*" onchange="previewImg(this,'p5')"><img id="p5" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Penjelasan:</label><textarea id="pjls5" placeholder="Cara menambah todo baru"></textarea></div></div>
+            <div class="screenshot-item"><h4>6️⃣ Fitur READ (Lihat Todos)</h4><input type="file" id="ss6" accept="image/*" onchange="previewImg(this,'p6')"><img id="p6" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Penjelasan:</label><textarea id="pjls6" placeholder="Daftar todo yang ditampilkan"></textarea></div></div>
+            <div class="screenshot-item"><h4>7️⃣ Fitur UPDATE (Toggle Status)</h4><input type="file" id="ss7" accept="image/*" onchange="previewImg(this,'p7')"><img id="p7" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Penjelasan:</label><textarea id="pjls7" placeholder="Cara mengubah status todo"></textarea></div></div>
+            <div class="screenshot-item"><h4>8️⃣ Fitur DELETE (Hapus Todo)</h4><input type="file" id="ss8" accept="image/*" onchange="previewImg(this,'p8')"><img id="p8" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Penjelasan:</label><textarea id="pjls8" placeholder="Cara menghapus todo"></textarea></div></div>
+            
+            <div class="screenshot-item" style="border:2px solid #ffd700"><h4>9️⃣ BUKTI DATA PERSISTENT</h4>
+                <p style="color:#aaa;margin-bottom:15px">Screenshot sebelum restart, restart, dan setelah restart</p>
+                <div class="form-group"><label>9a. Data sebelum restart:</label><input type="file" id="ss9a" accept="image/*" onchange="previewImg(this,'p9a')"><img id="p9a" class="preview-img"></div>
+                <div class="form-group"><label>9b. Docker Compose Down & Up:</label><input type="file" id="ss9b" accept="image/*" onchange="previewImg(this,'p9b')"><img id="p9b" class="preview-img"></div>
+                <div class="form-group"><label>9c. Data setelah restart (masih ada!):</label><input type="file" id="ss9c" accept="image/*" onchange="previewImg(this,'p9c')"><img id="p9c" class="preview-img"></div>
+                <div class="form-group"><label>Penjelasan persistensi:</label><textarea id="pjls9" placeholder="Data masih ada karena menggunakan volume db-data"></textarea></div>
+            </div>
+            
+            <div class="screenshot-item"><h4>🔟 Docker Volume</h4><input type="file" id="ss10" accept="image/*" onchange="previewImg(this,'p10')"><img id="p10" class="preview-img"></div>
+        </div>
+
+        <div class="card">
+            <h2>⚠️ Kendala & Solusi</h2>
+            <div class="form-group"><label>Kendala:</label><textarea id="kendala" placeholder="Tidak ada kendala"></textarea></div>
+            <div class="form-group"><label>Solusi:</label><textarea id="solusi" placeholder="-"></textarea></div>
+        </div>
+
+        <div class="card">
+            <h2>💡 Kesimpulan</h2>
+            <textarea id="kesimpulan" style="min-height:180px" placeholder="- Docker Compose memudahkan deployment multi-container
+- Volume memastikan data persist
+- Flask + MySQL bisa terhubung via Docker network
+- Environment variables untuk konfigurasi
+- depends_on mengatur urutan startup"></textarea>
+        </div>
+
+        <div class="card uts">
+            <h2>📊 Self Assessment</h2>
+            <p style="color:#aaa;margin-bottom:15px">Isi nilai yang kamu rasa pantas untuk dirimu sendiri:</p>
+            <div class="row">
+                <div class="form-group"><label>Docker Compose berjalan (max 20)</label><input type="text" id="score1" placeholder="0-20"></div>
+                <div class="form-group"><label>Web & DB terhubung (max 15)</label><input type="text" id="score2" placeholder="0-15"></div>
+            </div>
+            <div class="row">
+                <div class="form-group"><label>Create todo (max 15)</label><input type="text" id="score3" placeholder="0-15"></div>
+                <div class="form-group"><label>Read todos (max 10)</label><input type="text" id="score4" placeholder="0-10"></div>
+            </div>
+            <div class="row">
+                <div class="form-group"><label>Update status (max 10)</label><input type="text" id="score5" placeholder="0-10"></div>
+                <div class="form-group"><label>Delete todo (max 10)</label><input type="text" id="score6" placeholder="0-10"></div>
+            </div>
+            <div class="row">
+                <div class="form-group"><label>Data persistent (max 10)</label><input type="text" id="score7" placeholder="0-10"></div>
+                <div class="form-group"><label>README & UI (max 10)</label><input type="text" id="score8" placeholder="0-10"></div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-secondary" onclick="preview()">👁️ Preview</button>
+            <button class="btn btn-primary" onclick="download()">📥 Download LAPORAN.md</button>
+        </div>
+        <div class="preview-section" id="previewSection"><h3 style="color:#ffd700;margin-bottom:15px">📄 Preview Laporan UTS</h3><div class="preview-content" id="previewContent"></div></div>
+    </div>
+    <div class="success-message" id="msg"></div>
+
+    <script>
+        document.getElementById('tanggal').valueAsDate=new Date();
+        function previewImg(i,id){const img=document.getElementById(id);if(i.files[0]){const r=new FileReader();r.onload=e=>{img.src=e.target.result;img.style.display='block'};r.readAsDataURL(i.files[0])}}
+        function v(id){return document.getElementById(id)?.value||''}
+        function c(id){return document.getElementById(id)?.checked?'✅ Sudah':'⬜ Belum'}
+
+        function generateMd(){
+            const tgl=v('tanggal')?new Date(v('tanggal')).toLocaleDateString('id-ID'):'[Tanggal]';
+            return `# 📝 Laporan UTS - Pertemuan 8
+
+## 📋 Project Todo List dengan Docker Compose
+
+---
+
+## 👤 Identitas Mahasiswa
+
+| Field | Isi |
+|-------|-----|
+| **Nama** | ${v('nama')||'[Nama]'} |
+| **NIM** | ${v('nim')||'[NIM]'} |
+| **Kelas** | ${v('kelas')||'[Kelas]'} |
+| **Tanggal** | ${tgl} |
+
+---
+
+## ✅ Checklist Fitur
+
+| No | Fitur | Status |
+|----|-------|--------|
+| 1 | Docker Compose berjalan | ${c('task1')} |
+| 2 | Flask + MySQL terhubung | ${c('task2')} |
+| 3 | **Create** - Tambah todo | ${c('task3')} |
+| 4 | **Read** - Lihat todos | ${c('task4')} |
+| 5 | **Update** - Toggle status | ${c('task5')} |
+| 6 | **Delete** - Hapus todo | ${c('task6')} |
+| 7 | Data persistent | ${c('task7')} |
+
+---
+
+## 💻 Kode Program
+
+### docker-compose.yml
+\`\`\`yaml
+${v('kode_compose')||'# docker-compose.yml'}
+\`\`\`
+
+### app/Dockerfile
+\`\`\`dockerfile
+${v('kode_dockerfile')||'# Dockerfile'}
+\`\`\`
+
+### app/requirements.txt
+\`\`\`
+${v('kode_req')||'flask'}
+\`\`\`
+
+### app/app.py
+\`\`\`python
+${v('kode_app')||'# app.py'}
+\`\`\`
+
+### app/templates/index.html
+\`\`\`html
+${v('kode_html')||'<!-- index.html -->'}
+\`\`\`
+
+### init.sql
+\`\`\`sql
+${v('kode_sql')||'-- init.sql'}
+\`\`\`
+
+---
+
+## 🖼️ Screenshot
+
+### 1️⃣ Struktur Folder
+![Struktur](ss/01-struktur-folder.png)
+
+### 2️⃣ Docker Compose Up
+![Up](ss/02-compose-up.png)
+\`\`\`
+${v('out_up')||'[Output]'}
+\`\`\`
+
+### 3️⃣ Docker Compose PS
+![PS](ss/03-compose-ps.png)
+\`\`\`
+${v('out_ps')||'[Output]'}
+\`\`\`
+
+### 4️⃣ Tampilan Awal
+![Tampilan](ss/04-tampilan-awal.png)
+
+### 5️⃣ CREATE (Tambah Todo)
+![Create](ss/05-create-todo.png)
+\`\`\`
+${v('pjls5')||'[Penjelasan]'}
+\`\`\`
+
+### 6️⃣ READ (Lihat Todos)
+![Read](ss/06-read-todos.png)
+\`\`\`
+${v('pjls6')||'[Penjelasan]'}
+\`\`\`
+
+### 7️⃣ UPDATE (Toggle Status)
+![Update](ss/07-update-todo.png)
+\`\`\`
+${v('pjls7')||'[Penjelasan]'}
+\`\`\`
+
+### 8️⃣ DELETE (Hapus Todo)
+![Delete](ss/08-delete-todo.png)
+\`\`\`
+${v('pjls8')||'[Penjelasan]'}
+\`\`\`
+
+---
+
+## 💾 Bukti Data Persistent
+
+### 9a. Sebelum Restart
+![Before](ss/09a-before-restart.png)
+
+### 9b. Docker Compose Down & Up
+![Restart](ss/09b-restart.png)
+
+### 9c. Setelah Restart (Data Masih Ada!)
+![After](ss/09c-after-restart.png)
+
+**Penjelasan:**
+\`\`\`
+${v('pjls9')||'Data masih ada karena volume'}
+\`\`\`
+
+### 🔟 Docker Volume
+![Volume](ss/10-docker-volume.png)
+
+---
+
+## ⚠️ Kendala & Solusi
+**Kendala:** ${v('kendala')||'Tidak ada'}
+**Solusi:** ${v('solusi')||'-'}
+
+---
+
+## 💡 Kesimpulan
+\`\`\`
+${v('kesimpulan')||'[Kesimpulan]'}
+\`\`\`
+
+---
+
+## 📊 Self Assessment
+
+| Kriteria | Max | Nilai |
+|----------|-----|-------|
+| Docker Compose | 20 | ${v('score1')||'-'} |
+| Web & DB | 15 | ${v('score2')||'-'} |
+| Create | 15 | ${v('score3')||'-'} |
+| Read | 10 | ${v('score4')||'-'} |
+| Update | 10 | ${v('score5')||'-'} |
+| Delete | 10 | ${v('score6')||'-'} |
+| Persistent | 10 | ${v('score7')||'-'} |
+| README & UI | 10 | ${v('score8')||'-'} |
+| **Total** | **100** | **${(parseInt(v('score1'))||0)+(parseInt(v('score2'))||0)+(parseInt(v('score3'))||0)+(parseInt(v('score4'))||0)+(parseInt(v('score5'))||0)+(parseInt(v('score6'))||0)+(parseInt(v('score7'))||0)+(parseInt(v('score8'))||0)}** |
+
+---
+
+## 📊 Penilaian Dosen
+
+> *Diisi oleh Dosen/Asisten*
+
+| Kriteria | Nilai |
+|----------|-------|
+| Docker Compose | /20 |
+| Web & DB | /15 |
+| Create | /15 |
+| Read | /10 |
+| Update | /10 |
+| Delete | /10 |
+| Persistent | /10 |
+| README & UI | /10 |
+| **Total** | **/100** |
+
+**Nilai Akhir UTS:** _______
+
+---
+
+<div align="center">
+
+⭐ **UTS - Pertemuan 8** | [🏠 README](README.md)
+
+### ✨ Terima Kasih!
+
+</div>
+`}
+
+        function preview(){document.getElementById('previewContent').textContent=generateMd();document.getElementById('previewSection').style.display='block'}
+        function download(){const b=new Blob([generateMd()],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='LAPORAN.md';a.click();const m=document.getElementById('msg');m.textContent='✅ LAPORAN.md Downloaded!';m.style.display='block';setTimeout(()=>m.style.display='none',3000)}
+
+        const fields=['nama','nim','kelas','tanggal','task1','task2','task3','task4','task5','task6','task7','kode_compose','kode_dockerfile','kode_req','kode_app','kode_html','kode_sql','out_up','out_ps','pjls5','pjls6','pjls7','pjls8','pjls9','kendala','solusi','kesimpulan','score1','score2','score3','score4','score5','score6','score7','score8'];
+        function save(){const d={};fields.forEach(f=>{const el=document.getElementById(f);if(el)d[f]=el.type==='checkbox'?el.checked:el.value});localStorage.setItem('laporan_p8',JSON.stringify(d))}
+        function load(){const s=localStorage.getItem('laporan_p8');if(s){const d=JSON.parse(s);fields.forEach(f=>{const el=document.getElementById(f);if(el)el.type==='checkbox'?el.checked=d[f]:el.value=d[f]||''})}}
+        document.querySelectorAll('input,textarea').forEach(el=>{el.addEventListener('change',save);el.addEventListener('input',save)});
+        load();
+    </script>
+</body>
+</html>

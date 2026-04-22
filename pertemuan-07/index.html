@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertemuan 7 - Kubernetes Deployment & Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+        .nav { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); padding: 15px 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1e293b; }
+        .nav-content { max-width: 1000px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
+        .nav a:hover { color: #ec4899; }
+        .nav-title { font-weight: 600; color: #f1f5f9; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 50px; padding: 40px; background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 20px; border: 1px solid rgba(236, 72, 153, 0.2); }
+        .header-badge { display: inline-block; background: #ec4899; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 20px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(90deg, #ec4899, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: #94a3b8; font-size: 1.1rem; }
+        .section { margin-bottom: 40px; }
+        .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; margin-bottom: 20px; color: #f1f5f9; }
+        .section-title i { color: #ec4899; }
+        .card { background: #1e293b; border-radius: 15px; padding: 25px; margin-bottom: 20px; border: 1px solid #334155; }
+        .card h3 { color: #f1f5f9; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .card h3 i { color: #ec4899; }
+        .objectives { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .objective-item { background: rgba(236, 72, 153, 0.1); padding: 15px 20px; border-radius: 10px; border-left: 3px solid #ec4899; display: flex; align-items: center; gap: 12px; }
+        .objective-item i { color: #ec4899; }
+        .code-block { background: #0f172a; border-radius: 12px; overflow: hidden; margin: 20px 0; border: 1px solid #334155; }
+        .code-header { background: #1e293b; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .code-header span { color: #94a3b8; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .code-header button { background: #334155; border: none; color: #94a3b8; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s; }
+        .code-header button:hover { background: #ec4899; color: white; }
+        .code-content { padding: 20px; overflow-x: auto; }
+        .code-content pre { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #e2e8f0; margin: 0; }
+        .code-content .comment { color: #6b7280; }
+        .code-content .command { color: #ec4899; }
+        .code-content .keyword { color: #f59e0b; }
+        .code-content .string { color: #10b981; }
+        .code-content .key { color: #8b5cf6; }
+        .diagram { background: #0f172a; border-radius: 12px; padding: 30px; margin: 20px 0; border: 1px solid #334155; text-align: center; overflow-x: auto; }
+        .diagram pre { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: #94a3b8; display: inline-block; text-align: left; }
+        .info-box { background: rgba(236, 72, 153, 0.1); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .info-box.warning { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+        .info-box.success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
+        .info-box h4 { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: #ec4899; }
+        .info-box.warning h4 { color: #f59e0b; }
+        .info-box.success h4 { color: #10b981; }
+        .table-container { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 12px; overflow: hidden; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #0f172a; color: #ec4899; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        .file-tree { background: #0f172a; border-radius: 12px; padding: 20px; border: 1px solid #334155; font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .file-tree .folder { color: #f59e0b; }
+        .file-tree .file { color: #10b981; }
+        .task-card { background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 15px; padding: 25px; margin: 20px 0; }
+        .task-card h4 { color: #ec4899; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .task-points { background: #ec4899; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; }
+        .footer-nav { display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1e293b; }
+        .footer-nav a { display: flex; align-items: center; gap: 10px; color: #94a3b8; text-decoration: none; padding: 15px 25px; background: #1e293b; border-radius: 10px; transition: all 0.3s; }
+        .footer-nav a:hover { background: #ec4899; color: white; }
+        @media (max-width: 768px) { .header h1 { font-size: 1.8rem; } }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="../pertemuan-06/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 6</a>
+            <span class="nav-title">Pertemuan 7</span>
+            <a href="../pertemuan-08/index.html">Pertemuan 8 <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <span class="header-badge">Minggu 7</span>
+            <h1>🚀 Kubernetes Deployment & Service</h1>
+            <p>Mengelola aplikasi dengan Deployment dan mengekspos dengan Service</p>
+        </header>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-bullseye"></i> Tujuan Pembelajaran</h2>
+            <div class="objectives">
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Memahami Kubernetes Deployment</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Membuat file YAML manifest</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Memahami Kubernetes Service</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Mengakses aplikasi dari luar cluster</span></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-book"></i> Teori</h2>
+
+            <div class="card">
+                <h3><i class="fas fa-sync-alt"></i> Apa itu Deployment?</h3>
+                <p>Deployment adalah cara mengelola Pod dengan fitur:</p>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li><strong>Replicas</strong> - Menjalankan multiple Pod</li>
+                    <li><strong>Self-healing</strong> - Otomatis recreate Pod yang crash</li>
+                    <li><strong>Rolling update</strong> - Update tanpa downtime</li>
+                    <li><strong>Rollback</strong> - Kembali ke versi sebelumnya</li>
+                </ul>
+
+                <div class="diagram">
+                    <pre>
+┌────────────────────────────────────────────────────────────────┐
+│                        Deployment                              │
+│                    (nginx-deployment)                          │
+│                                                                │
+│  replicas: 3                                                   │
+│           │                                                    │
+│           ▼                                                    │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐   │
+│  │     Pod 1      │  │     Pod 2      │  │     Pod 3      │   │
+│  │    [nginx]     │  │    [nginx]     │  │    [nginx]     │   │
+│  └────────────────┘  └────────────────┘  └────────────────┘   │
+│                                                                │
+│  ✅ Jika Pod 2 crash → Otomatis dibuat Pod baru!              │
+└────────────────────────────────────────────────────────────────┘
+                    </pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-network-wired"></i> Apa itu Service?</h3>
+                <p>Service adalah cara untuk <strong>mengekspos aplikasi</strong> agar bisa diakses.</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Tipe Service</th><th>Penjelasan</th><th>Use Case</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>ClusterIP</code></td><td>Hanya bisa diakses dari dalam cluster</td><td>Internal service</td></tr>
+                            <tr><td><code>NodePort</code></td><td>Bisa diakses dari luar via Node IP:Port</td><td>Development/Testing</td></tr>
+                            <tr><td><code>LoadBalancer</code></td><td>Membuat external load balancer</td><td>Production (cloud)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="diagram">
+                    <pre>
+                      User/Browser
+                           │
+                           ▼
+┌──────────────────────────────────────────────────────────┐
+│                   Service (NodePort)                     │
+│                  Port: 30080 → 80                        │
+└──────────────────────────┬───────────────────────────────┘
+                           │
+               ┌───────────┼───────────┐
+               │           │           │
+               ▼           ▼           ▼
+          ┌────────┐  ┌────────┐  ┌────────┐
+          │ Pod 1  │  │ Pod 2  │  │ Pod 3  │
+          │ nginx  │  │ nginx  │  │ nginx  │
+          └────────┘  └────────┘  └────────┘
+                    </pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-laptop-code"></i> Praktikum</h2>
+
+            <div class="card">
+                <h3><i class="fas fa-file-code"></i> Praktik 1: Membuat Deployment</h3>
+                
+                <p>Struktur folder:</p>
+                <div class="file-tree">
+                    <span class="folder">📁 kubernetes-praktik/</span><br>
+                    &nbsp;&nbsp;├── <span class="file">📄 deployment.yaml</span><br>
+                    &nbsp;&nbsp;└── <span class="file">📄 service.yaml</span>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-file-alt"></i> deployment.yaml</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="key">apiVersion:</span> apps/v1
+<span class="key">kind:</span> Deployment
+<span class="key">metadata:</span>
+  <span class="key">name:</span> nginx-deployment
+<span class="key">spec:</span>
+  <span class="key">replicas:</span> <span class="string">3</span>                   <span class="comment"># Jumlah Pod</span>
+  <span class="key">selector:</span>
+    <span class="key">matchLabels:</span>
+      <span class="key">app:</span> nginx                 <span class="comment"># Label untuk identify Pods</span>
+  <span class="key">template:</span>
+    <span class="key">metadata:</span>
+      <span class="key">labels:</span>
+        <span class="key">app:</span> nginx
+    <span class="key">spec:</span>
+      <span class="key">containers:</span>
+      - <span class="key">name:</span> nginx
+        <span class="key">image:</span> nginx:latest
+        <span class="key">ports:</span>
+        - <span class="key">containerPort:</span> <span class="string">80</span></pre></div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Apply Deployment</span>
+<span class="command">kubectl</span> apply -f deployment.yaml
+
+<span class="comment"># Lihat Deployment</span>
+<span class="command">kubectl</span> get deployments
+
+<span class="comment"># Lihat Pods yang dibuat</span>
+<span class="command">kubectl</span> get pods
+
+<span class="comment"># Lihat detail Deployment</span>
+<span class="command">kubectl</span> describe deployment nginx-deployment</pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-globe"></i> Praktik 2: Membuat Service NodePort</h3>
+                
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-file-alt"></i> service.yaml</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="key">apiVersion:</span> v1
+<span class="key">kind:</span> Service
+<span class="key">metadata:</span>
+  <span class="key">name:</span> nginx-service
+<span class="key">spec:</span>
+  <span class="key">type:</span> NodePort
+  <span class="key">selector:</span>
+    <span class="key">app:</span> nginx                    <span class="comment"># Harus match dengan label Pod</span>
+  <span class="key">ports:</span>
+  - <span class="key">port:</span> <span class="string">80</span>                      <span class="comment"># Port di dalam cluster</span>
+    <span class="key">targetPort:</span> <span class="string">80</span>                <span class="comment"># Port container</span>
+    <span class="key">nodePort:</span> <span class="string">30080</span>               <span class="comment"># Port untuk akses dari luar (30000-32767)</span></pre></div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Apply Service</span>
+<span class="command">kubectl</span> apply -f service.yaml
+
+<span class="comment"># Lihat Service</span>
+<span class="command">kubectl</span> get services
+
+<span class="comment"># Akses via Minikube</span>
+<span class="command">minikube</span> service nginx-service</pre></div>
+                </div>
+
+                <div class="info-box success">
+                    <h4><i class="fas fa-check-circle"></i> Berhasil!</h4>
+                    <p>Browser akan terbuka dengan halaman nginx!</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-sync"></i> Praktik 3: Self-Healing</h3>
+                
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Lihat Pods</span>
+<span class="command">kubectl</span> get pods
+
+<span class="comment"># Hapus salah satu Pod</span>
+<span class="command">kubectl</span> delete pod [nama-pod]
+
+<span class="comment"># Lihat lagi - Pod baru otomatis dibuat!</span>
+<span class="command">kubectl</span> get pods
+
+<span class="comment"># Jumlah tetap 3 karena replicas: 3</span></pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-expand-arrows-alt"></i> Praktik 4: Scaling</h3>
+                
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Scale up ke 5 replicas</span>
+<span class="command">kubectl</span> scale deployment nginx-deployment <span class="keyword">--replicas</span>=5
+
+<span class="comment"># Lihat Pods bertambah</span>
+<span class="command">kubectl</span> get pods
+
+<span class="comment"># Scale down ke 2</span>
+<span class="command">kubectl</span> scale deployment nginx-deployment <span class="keyword">--replicas</span>=2
+
+<span class="comment"># Lihat Pods berkurang</span>
+<span class="command">kubectl</span> get pods</pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-redo"></i> Praktik 5: Update Image (Rolling Update)</h3>
+                
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Update image ke versi lain</span>
+<span class="command">kubectl</span> set image deployment/nginx-deployment nginx=nginx:alpine
+
+<span class="comment"># Lihat proses rolling update</span>
+<span class="command">kubectl</span> rollout status deployment/nginx-deployment
+
+<span class="comment"># Lihat history</span>
+<span class="command">kubectl</span> rollout history deployment/nginx-deployment
+
+<span class="comment"># Rollback ke versi sebelumnya</span>
+<span class="command">kubectl</span> rollout undo deployment/nginx-deployment</pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-trash"></i> Cleanup</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Hapus semua resource dari file</span>
+<span class="command">kubectl</span> delete -f deployment.yaml
+<span class="command">kubectl</span> delete -f service.yaml
+
+<span class="comment"># Atau hapus semua sekaligus</span>
+<span class="command">kubectl</span> delete all <span class="keyword">--all</span></pre></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-tasks"></i> Tugas Praktikum</h2>
+
+            <div class="task-card">
+                <h4><i class="fas fa-clipboard-check"></i> Tugas: Deploy Aplikasi Flask <span class="task-points">100 poin</span></h4>
+                <ol style="margin: 15px 0; padding-left: 20px;">
+                    <li>Gunakan image Flask yang sudah di-push ke Docker Hub di pertemuan 5</li>
+                    <li>Buat file <code>deployment.yaml</code> dengan:
+                        <ul>
+                            <li>replicas: 3</li>
+                            <li>image: [username]/flask-app:1.0</li>
+                        </ul>
+                    </li>
+                    <li>Buat file <code>service.yaml</code> dengan tipe NodePort</li>
+                    <li>Deploy ke Minikube</li>
+                    <li>Test self-healing dengan delete Pod</li>
+                    <li>Test scaling (scale ke 5, lalu ke 2)</li>
+                    <li>Screenshot semua hasil dan jelaskan prosesnya</li>
+                </ol>
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <a href="../pertemuan-06/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 6</a>
+            <a href="../pertemuan-08/index.html">Pertemuan 8 <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code);
+            button.textContent = 'Copied!';
+            setTimeout(() => button.textContent = 'Copy', 2000);
+        }
+    </script>
+</body>
+</html>

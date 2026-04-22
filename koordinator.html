@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Koordinator - Cloud Native Practicum</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#0f0f23 0%,#1a1a3e 100%);min-height:100vh;color:#fff}
+        .header{background:linear-gradient(135deg,#667eea,#764ba2);padding:30px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+        .header h1{font-size:2rem;margin-bottom:5px}
+        .header p{color:rgba(255,255,255,0.8)}
+        .container{max-width:1400px;margin:0 auto;padding:20px}
+        
+        /* Tabs */
+        .tabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:20px;background:rgba(0,0,0,0.3);padding:10px;border-radius:15px}
+        .tab{padding:12px 20px;background:rgba(255,255,255,0.1);border:none;color:#fff;border-radius:10px;cursor:pointer;transition:all 0.3s;font-size:0.9rem}
+        .tab:hover{background:rgba(255,255,255,0.2)}
+        .tab.active{background:linear-gradient(135deg,#00d4ff,#0099cc);color:#000;font-weight:bold}
+        .tab.uts{border:2px solid #ffd700}
+        .tab.uts.active{background:linear-gradient(135deg,#ffd700,#ff9500)}
+        
+        /* Stats */
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:30px}
+        .stat-card{background:rgba(255,255,255,0.05);padding:20px;border-radius:15px;text-align:center;border:1px solid rgba(255,255,255,0.1)}
+        .stat-card h3{font-size:2rem;color:#00d4ff}
+        .stat-card p{color:#888;font-size:0.85rem}
+        .stat-card.warning h3{color:#ffd700}
+        .stat-card.success h3{color:#00ff88}
+        
+        /* Content */
+        .content{display:none}
+        .content.active{display:block}
+        
+        /* Student List */
+        .student-section{background:rgba(255,255,255,0.05);border-radius:15px;padding:25px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1)}
+        .student-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:15px}
+        .student-header h2{color:#00d4ff;font-size:1.3rem}
+        .add-btn{background:linear-gradient(135deg,#00ff88,#00cc6a);color:#000;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold}
+        
+        /* Table */
+        .table-wrapper{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;min-width:800px}
+        th,td{padding:12px 15px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1)}
+        th{background:rgba(0,0,0,0.3);color:#00d4ff;font-weight:600;position:sticky;top:0}
+        tr:hover{background:rgba(255,255,255,0.05)}
+        
+        /* Input in table */
+        .tbl-input{width:100%;padding:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.2);border-radius:5px;color:#fff;font-size:0.9rem}
+        .tbl-input:focus{outline:none;border-color:#00d4ff}
+        .tbl-input.score{width:60px;text-align:center}
+        .tbl-input.total{background:rgba(0,212,255,0.2);font-weight:bold}
+        
+        /* Status badges */
+        .status{padding:5px 12px;border-radius:20px;font-size:0.8rem;font-weight:bold}
+        .status.done{background:rgba(0,255,136,0.2);color:#00ff88}
+        .status.pending{background:rgba(255,215,0,0.2);color:#ffd700}
+        .status.missing{background:rgba(255,77,77,0.2);color:#ff4d4d}
+        
+        /* Actions */
+        .actions{display:flex;gap:5px}
+        .action-btn{padding:6px 12px;border:none;border-radius:5px;cursor:pointer;font-size:0.8rem}
+        .action-btn.view{background:#00d4ff;color:#000}
+        .action-btn.delete{background:#ff4d4d;color:#fff}
+        
+        /* Modal */
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center}
+        .modal.show{display:flex}
+        .modal-content{background:#1a1a3e;border-radius:15px;padding:30px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto}
+        .modal-content h3{color:#00d4ff;margin-bottom:20px}
+        .modal-close{float:right;background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
+        .form-group{margin-bottom:15px}
+        .form-group label{display:block;margin-bottom:5px;color:#ccc}
+        .form-group input,.form-group select{width:100%;padding:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff}
+        .modal-btn{width:100%;padding:15px;background:linear-gradient(135deg,#00d4ff,#0099cc);border:none;border-radius:8px;color:#000;font-weight:bold;cursor:pointer;margin-top:10px}
+        
+        /* Summary section */
+        .summary{background:rgba(102,126,234,0.1);border:1px solid rgba(102,126,234,0.3);border-radius:15px;padding:20px;margin-top:20px}
+        .summary h3{color:#667eea;margin-bottom:15px}
+        .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
+        .summary-item{background:rgba(0,0,0,0.2);padding:15px;border-radius:10px}
+        .summary-item label{color:#888;font-size:0.85rem}
+        .summary-item span{display:block;font-size:1.5rem;color:#fff;font-weight:bold}
+        
+        /* Export buttons */
+        .export-section{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+        .export-btn{padding:12px 25px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;display:flex;align-items:center;gap:8px}
+        .export-btn.csv{background:#00ff88;color:#000}
+        .export-btn.json{background:#ffd700;color:#000}
+        .export-btn.print{background:#00d4ff;color:#000}
+        
+        /* Pertemuan info */
+        .pertemuan-info{background:rgba(0,212,255,0.1);border-left:4px solid #00d4ff;padding:15px;border-radius:0 10px 10px 0;margin-bottom:20px}
+        .pertemuan-info.uts{border-color:#ffd700;background:rgba(255,215,0,0.1)}
+        .pertemuan-info h4{color:#00d4ff;margin-bottom:5px}
+        .pertemuan-info.uts h4{color:#ffd700}
+        .pertemuan-info p{color:#aaa;font-size:0.9rem}
+        
+        /* Criteria */
+        .criteria{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:15px}
+        .criteria-item{text-align:center;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px}
+        .criteria-item label{display:block;color:#888;font-size:0.75rem;margin-bottom:5px}
+        .criteria-item span{color:#00d4ff;font-weight:bold}
+        
+        /* Responsive */
+        @media(max-width:768px){
+            .header h1{font-size:1.5rem}
+            .tabs{justify-content:center}
+            .tab{padding:10px 15px;font-size:0.8rem}
+        }
+        
+        /* Toast */
+        .toast{position:fixed;bottom:20px;right:20px;background:#00ff88;color:#000;padding:15px 25px;border-radius:10px;font-weight:bold;display:none;z-index:1001}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👨‍🏫 Dashboard Koordinator</h1>
+        <p>Cloud Native Practicum - Penilaian Mahasiswa</p>
+    </div>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats" id="stats">
+            <div class="stat-card"><h3 id="totalMhs">0</h3><p>Total Mahasiswa</p></div>
+            <div class="stat-card success"><h3 id="completeMhs">0</h3><p>Lengkap</p></div>
+            <div class="stat-card warning"><h3 id="pendingMhs">0</h3><p>Pending</p></div>
+            <div class="stat-card"><h3 id="avgScore">0</h3><p>Rata-rata Nilai</p></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab(0)">📊 Semua</button>
+            <button class="tab" onclick="showTab(1)">🐳 P1: Dasar Docker</button>
+            <button class="tab" onclick="showTab(2)">🏗️ P2: Build Image</button>
+            <button class="tab" onclick="showTab(3)">💾 P3: Volume</button>
+            <button class="tab" onclick="showTab(4)">🎼 P4: Compose</button>
+            <button class="tab" onclick="showTab(5)">☁️ P5: Docker Hub</button>
+            <button class="tab" onclick="showTab(6)">☸️ P6: K8s Dasar</button>
+            <button class="tab" onclick="showTab(7)">🚀 P7: Deploy</button>
+            <button class="tab uts" onclick="showTab(8)">⭐ P8: UTS</button>
+        </div>
+
+        <!-- Content: Overview -->
+        <div class="content active" id="content-0">
+            <div class="student-section">
+                <div class="student-header">
+                    <h2>📋 Ringkasan Semua Pertemuan</h2>
+                    <button class="add-btn" onclick="openAddModal()">➕ Tambah Mahasiswa</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NIM</th>
+                                <th>Nama</th>
+                                <th>Kelas</th>
+                                <th>P1</th>
+                                <th>P2</th>
+                                <th>P3</th>
+                                <th>P4</th>
+                                <th>P5</th>
+                                <th>P6</th>
+                                <th>P7</th>
+                                <th>UTS</th>
+                                <th>Total</th>
+                                <th>Rata²</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overviewTable"></tbody>
+                    </table>
+                </div>
+                <div class="export-section">
+                    <button class="export-btn csv" onclick="exportCSV()">📥 Export CSV</button>
+                    <button class="export-btn json" onclick="exportJSON()">📥 Export JSON</button>
+                    <button class="export-btn print" onclick="window.print()">🖨️ Print</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content: Pertemuan 1-8 -->
+        ${[1,2,3,4,5,6,7,8].map(p => `
+        <div class="content" id="content-${p}">
+            <div class="pertemuan-info ${p===8?'uts':''}">
+                <h4>${getPertemuanTitle(p)}</h4>
+                <p>${getPertemuanDesc(p)}</p>
+            </div>
+            <div class="criteria">
+                ${getCriteria(p).map(c => `<div class="criteria-item"><label>${c.name}</label><span>/${c.max}</span></div>`).join('')}
+            </div>
+            <div class="student-section">
+                <div class="student-header">
+                    <h2>📝 Penilaian Pertemuan ${p}</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NIM</th>
+                                <th>Nama</th>
+                                ${getCriteria(p).map(c => `<th>${c.short}</th>`).join('')}
+                                <th>Total</th>
+                                <th>Catatan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-p${p}"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        `).join('')}
+    </div>
+
+    <!-- Add Student Modal -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h3>➕ Tambah Mahasiswa</h3>
+            <div class="form-group">
+                <label>NIM *</label>
+                <input type="text" id="newNim" placeholder="12345678">
+            </div>
+            <div class="form-group">
+                <label>Nama Lengkap *</label>
+                <input type="text" id="newNama" placeholder="Budi Santoso">
+            </div>
+            <div class="form-group">
+                <label>Kelas *</label>
+                <input type="text" id="newKelas" placeholder="TI-3A">
+            </div>
+            <button class="modal-btn" onclick="addStudent()">✅ Tambah Mahasiswa</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Criteria for each pertemuan
+        function getCriteria(p) {
+            const criteria = {
+                1: [{name:'Screenshot',short:'SS',max:25},{name:'Output',short:'Out',max:25},{name:'Penjelasan',short:'Pjls',max:25},{name:'Kesimpulan',short:'Ksim',max:25}],
+                2: [{name:'Dockerfile',short:'Dckr',max:25},{name:'Build',short:'Bld',max:25},{name:'Run',short:'Run',max:25},{name:'Screenshot',short:'SS',max:25}],
+                3: [{name:'Volume',short:'Vol',max:25},{name:'Port',short:'Port',max:25},{name:'Nginx',short:'Ngx',max:25},{name:'Screenshot',short:'SS',max:25}],
+                4: [{name:'Compose',short:'Cmp',max:25},{name:'Up/Down',short:'Up',max:25},{name:'Multi',short:'Mlt',max:25},{name:'Screenshot',short:'SS',max:25}],
+                5: [{name:'Push',short:'Push',max:25},{name:'Pull',short:'Pull',max:25},{name:'Tag',short:'Tag',max:25},{name:'Screenshot',short:'SS',max:25}],
+                6: [{name:'Pod',short:'Pod',max:25},{name:'Apply',short:'Aply',max:25},{name:'Get',short:'Get',max:25},{name:'Screenshot',short:'SS',max:25}],
+                7: [{name:'Deploy',short:'Dply',max:25},{name:'Service',short:'Svc',max:25},{name:'Scale',short:'Scl',max:25},{name:'Screenshot',short:'SS',max:25}],
+                8: [{name:'Compose',short:'Cmp',max:20},{name:'Web+DB',short:'W+D',max:15},{name:'Create',short:'C',max:15},{name:'Read',short:'R',max:10},{name:'Update',short:'U',max:10},{name:'Delete',short:'D',max:10},{name:'Persist',short:'Per',max:10},{name:'UI',short:'UI',max:10}]
+            };
+            return criteria[p];
+        }
+
+        function getPertemuanTitle(p) {
+            const titles = {
+                1: '🐳 Pertemuan 1: Pengenalan Docker',
+                2: '🏗️ Pertemuan 2: Build Docker Image',
+                3: '💾 Pertemuan 3: Volume & Port Mapping',
+                4: '🎼 Pertemuan 4: Docker Compose',
+                5: '☁️ Pertemuan 5: Docker Hub',
+                6: '☸️ Pertemuan 6: Dasar Kubernetes',
+                7: '🚀 Pertemuan 7: Deployment & Service',
+                8: '⭐ Pertemuan 8: UTS - Project Todo List'
+            };
+            return titles[p];
+        }
+
+        function getPertemuanDesc(p) {
+            const descs = {
+                1: 'docker run, pull, images, ps, stop, rm',
+                2: 'Dockerfile, build, Flask app containerization',
+                3: 'docker volume, port mapping, nginx',
+                4: 'docker-compose.yml, multi-container apps',
+                5: 'docker login, tag, push, pull dari registry',
+                6: 'kubectl, pod.yaml, apply, get pods',
+                7: 'deployment.yaml, service.yaml, scale, expose',
+                8: 'Full stack: Flask + MySQL + Docker Compose dengan CRUD'
+            };
+            return descs[p];
+        }
+
+        // Data storage
+        let students = JSON.parse(localStorage.getItem('koordinator_students')) || [];
+        let scores = JSON.parse(localStorage.getItem('koordinator_scores')) || {};
+
+        // Initialize with sample data if empty
+        if (students.length === 0) {
+            students = [
+                {nim: '12345001', nama: 'Ahmad Fauzi', kelas: 'TI-3A'},
+                {nim: '12345002', nama: 'Budi Santoso', kelas: 'TI-3A'},
+                {nim: '12345003', nama: 'Citra Dewi', kelas: 'TI-3A'},
+                {nim: '12345004', nama: 'Dian Pratama', kelas: 'TI-3B'},
+                {nim: '12345005', nama: 'Eka Putri', kelas: 'TI-3B'}
+            ];
+            saveData();
+        }
+
+        function saveData() {
+            localStorage.setItem('koordinator_students', JSON.stringify(students));
+            localStorage.setItem('koordinator_scores', JSON.stringify(scores));
+        }
+
+        function showTab(idx) {
+            document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+            document.querySelectorAll('.content').forEach((c,i) => c.classList.toggle('active', i===idx));
+            renderTables();
+        }
+
+        function renderTables() {
+            renderOverview();
+            for (let p = 1; p <= 8; p++) {
+                renderPertemuan(p);
+            }
+            updateStats();
+        }
+
+        function renderOverview() {
+            const tbody = document.getElementById('overviewTable');
+            tbody.innerHTML = students.map((s, idx) => {
+                const pScores = [];
+                let total = 0;
+                for (let p = 1; p <= 8; p++) {
+                    const key = `${s.nim}_p${p}`;
+                    const pTotal = scores[key]?.total || 0;
+                    pScores.push(pTotal);
+                    total += pTotal;
+                }
+                const avg = (total / 8).toFixed(1);
+                return `<tr>
+                    <td>${idx + 1}</td>
+                    <td>${s.nim}</td>
+                    <td>${s.nama}</td>
+                    <td>${s.kelas}</td>
+                    ${pScores.map((sc, i) => `<td><span class="status ${sc >= 70 ? 'done' : sc > 0 ? 'pending' : 'missing'}">${sc || '-'}</span></td>`).join('')}
+                    <td><strong>${total}</strong></td>
+                    <td><strong>${avg}</strong></td>
+                    <td class="actions">
+                        <button class="action-btn delete" onclick="deleteStudent('${s.nim}')">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderPertemuan(p) {
+            const tbody = document.getElementById(`table-p${p}`);
+            if (!tbody) return;
+            const criteria = getCriteria(p);
+            
+            tbody.innerHTML = students.map((s, idx) => {
+                const key = `${s.nim}_p${p}`;
+                const data = scores[key] || {};
+                
+                return `<tr>
+                    <td>${idx + 1}</td>
+                    <td>${s.nim}</td>
+                    <td>${s.nama}</td>
+                    ${criteria.map((c, i) => `<td><input type="number" class="tbl-input score" min="0" max="${c.max}" value="${data[`c${i}`] || ''}" onchange="updateScore('${s.nim}',${p},${i},this.value,${c.max})"></td>`).join('')}
+                    <td><input type="text" class="tbl-input total" value="${data.total || 0}" readonly></td>
+                    <td><input type="text" class="tbl-input" placeholder="Catatan..." value="${data.note || ''}" onchange="updateNote('${s.nim}',${p},this.value)"></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function updateScore(nim, p, criteriaIdx, value, max) {
+            const key = `${nim}_p${p}`;
+            if (!scores[key]) scores[key] = {};
+            
+            // Validate
+            let val = parseInt(value) || 0;
+            if (val > max) val = max;
+            if (val < 0) val = 0;
+            
+            scores[key][`c${criteriaIdx}`] = val;
+            
+            // Calculate total
+            const criteria = getCriteria(p);
+            let total = 0;
+            criteria.forEach((c, i) => {
+                total += parseInt(scores[key][`c${i}`]) || 0;
+            });
+            scores[key].total = total;
+            
+            saveData();
+            renderTables();
+            showToast('✅ Nilai disimpan');
+        }
+
+        function updateNote(nim, p, note) {
+            const key = `${nim}_p${p}`;
+            if (!scores[key]) scores[key] = {};
+            scores[key].note = note;
+            saveData();
+        }
+
+        function updateStats() {
+            const totalMhs = students.length;
+            let complete = 0;
+            let pending = 0;
+            let totalScore = 0;
+            let scoreCount = 0;
+
+            students.forEach(s => {
+                let hasAll = true;
+                let hasAny = false;
+                for (let p = 1; p <= 8; p++) {
+                    const key = `${s.nim}_p${p}`;
+                    const t = scores[key]?.total || 0;
+                    if (t === 0) hasAll = false;
+                    if (t > 0) {
+                        hasAny = true;
+                        totalScore += t;
+                        scoreCount++;
+                    }
+                }
+                if (hasAll) complete++;
+                else if (hasAny) pending++;
+            });
+
+            document.getElementById('totalMhs').textContent = totalMhs;
+            document.getElementById('completeMhs').textContent = complete;
+            document.getElementById('pendingMhs').textContent = pending;
+            document.getElementById('avgScore').textContent = scoreCount > 0 ? (totalScore / scoreCount).toFixed(1) : '0';
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('addModal').classList.remove('show');
+        }
+
+        function addStudent() {
+            const nim = document.getElementById('newNim').value.trim();
+            const nama = document.getElementById('newNama').value.trim();
+            const kelas = document.getElementById('newKelas').value.trim();
+
+            if (!nim || !nama || !kelas) {
+                alert('Semua field harus diisi!');
+                return;
+            }
+
+            if (students.find(s => s.nim === nim)) {
+                alert('NIM sudah ada!');
+                return;
+            }
+
+            students.push({nim, nama, kelas});
+            saveData();
+            renderTables();
+            closeModal();
+            showToast('✅ Mahasiswa ditambahkan');
+
+            // Clear form
+            document.getElementById('newNim').value = '';
+            document.getElementById('newNama').value = '';
+            document.getElementById('newKelas').value = '';
+        }
+
+        function deleteStudent(nim) {
+            if (!confirm('Hapus mahasiswa ini?')) return;
+            students = students.filter(s => s.nim !== nim);
+            // Also delete scores
+            Object.keys(scores).forEach(key => {
+                if (key.startsWith(nim)) delete scores[key];
+            });
+            saveData();
+            renderTables();
+            showToast('🗑️ Mahasiswa dihapus');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2000);
+        }
+
+        function exportCSV() {
+            let csv = 'NIM,Nama,Kelas,P1,P2,P3,P4,P5,P6,P7,UTS,Total,Rata-rata\n';
+            students.forEach(s => {
+                let row = [s.nim, s.nama, s.kelas];
+                let total = 0;
+                for (let p = 1; p <= 8; p++) {
+                    const key = `${s.nim}_p${p}`;
+                    const t = scores[key]?.total || 0;
+                    row.push(t);
+                    total += t;
+                }
+                row.push(total);
+                row.push((total / 8).toFixed(1));
+                csv += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'nilai_praktikum.csv';
+            a.click();
+            showToast('📥 CSV downloaded');
+        }
+
+        function exportJSON() {
+            const data = {students, scores, exportDate: new Date().toISOString()};
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'nilai_praktikum.json';
+            a.click();
+            showToast('📥 JSON downloaded');
+        }
+
+        // Initial render
+        renderTables();
+    </script>
+</body>
+</html>

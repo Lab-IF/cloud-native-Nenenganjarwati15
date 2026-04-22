@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Laporan - Pertemuan 7</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:100vh;padding:20px;color:#fff}.container{max-width:900px;margin:0 auto}h1{text-align:center;margin-bottom:10px}h1 span{color:#00d4ff}.subtitle{text-align:center;color:#888;margin-bottom:30px}.card{background:rgba(255,255,255,0.05);border-radius:15px;padding:25px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.1)}.card h2{color:#00d4ff;margin-bottom:20px}.form-group{margin-bottom:15px}label{display:block;margin-bottom:5px;color:#ccc;font-size:0.9rem}input[type="text"],input[type="date"],textarea{width:100%;padding:12px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:rgba(0,0,0,0.3);color:#fff;font-size:1rem;font-family:inherit}input:focus,textarea:focus{outline:none;border-color:#00d4ff}textarea{min-height:100px;resize:vertical}textarea.code{font-family:monospace;min-height:180px}.checkbox-group{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;margin-bottom:10px}.checkbox-group input{width:20px;height:20px}.checkbox-group label{margin:0;flex:1}.screenshot-item{background:rgba(0,0,0,0.2);padding:15px;border-radius:8px;margin-bottom:15px}.screenshot-item h4{color:#ffd700;margin-bottom:10px}input[type="file"]{width:100%;padding:10px;background:rgba(0,212,255,0.1);border:2px dashed rgba(0,212,255,0.5);border-radius:8px}.preview-img{max-width:100%;max-height:200px;border-radius:8px;margin-top:10px;display:none}.btn{padding:15px 30px;border:none;border-radius:8px;font-size:1rem;cursor:pointer}.btn-primary{background:linear-gradient(135deg,#00d4ff,#0099cc);color:#000;font-weight:bold}.btn-secondary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2)}.buttons{display:flex;gap:15px;flex-wrap:wrap;justify-content:center;margin-top:30px}.preview-section{background:#0d1117;border-radius:10px;padding:20px;margin-top:20px;display:none}.preview-content{background:#161b22;padding:20px;border-radius:8px;white-space:pre-wrap;font-family:monospace;font-size:0.85rem;max-height:400px;overflow-y:auto;color:#c9d1d9}.info-box{background:rgba(0,212,255,0.1);border-left:4px solid #00d4ff;padding:15px;margin-bottom:20px}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}.success-message{position:fixed;top:20px;right:20px;background:#00ff88;color:#000;padding:15px 25px;border-radius:10px;font-weight:bold;display:none;z-index:1000}.nav-link{text-align:center;margin-bottom:20px}.nav-link a{color:#00d4ff;text-decoration:none}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-link"><a href="README.md">📖 Materi</a> | <a href="index.html">🌐 Web</a> | <a href="../index.html">🏠 Home</a></div>
+        <h1>📝 Form Laporan <span>Pertemuan 7</span></h1>
+        <p class="subtitle">Kubernetes Deployment & Service</p>
+        <div class="info-box"><p style="color:#aaa">💡 Isi form → Download LAPORAN.md → Simpan screenshot di folder <code>ss/</code></p></div>
+
+        <div class="card">
+            <h2>👤 Identitas</h2>
+            <div class="row">
+                <div class="form-group"><label>Nama</label><input type="text" id="nama" placeholder="Budi Santoso"></div>
+                <div class="form-group"><label>NIM</label><input type="text" id="nim" placeholder="12345678"></div>
+            </div>
+            <div class="row">
+                <div class="form-group"><label>Kelas</label><input type="text" id="kelas" placeholder="TI-3A"></div>
+                <div class="form-group"><label>Tanggal</label><input type="date" id="tanggal"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>✅ Checklist</h2>
+            <div class="checkbox-group"><input type="checkbox" id="task1"><label>Buat deployment.yaml</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task2"><label>Buat service.yaml</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task3"><label>Apply deployment (3 replicas)</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task4"><label>Apply service NodePort</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task5"><label>Test self-healing</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task6"><label>Test scaling (5→2)</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task7"><label>Screenshot lengkap</label></div>
+        </div>
+
+        <div class="card">
+            <h2>💻 Kode YAML</h2>
+            <div class="form-group"><label>📄 deployment.yaml</label>
+                <textarea id="kode_deploy" class="code" placeholder="apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80"></textarea>
+            </div>
+            <div class="form-group"><label>📄 service.yaml</label>
+                <textarea id="kode_service" class="code" placeholder="apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: NodePort
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30080"></textarea>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🖼️ Screenshot</h2>
+            <div class="screenshot-item"><h4>1️⃣ File YAML</h4><input type="file" id="ss1" accept="image/*" onchange="previewImg(this,'p1')"><img id="p1" class="preview-img"></div>
+            <div class="screenshot-item"><h4>2️⃣ kubectl apply deployment</h4><input type="file" id="ss2" accept="image/*" onchange="previewImg(this,'p2')"><img id="p2" class="preview-img"></div>
+            <div class="screenshot-item"><h4>3️⃣ kubectl get deployments</h4><input type="file" id="ss3" accept="image/*" onchange="previewImg(this,'p3')"><img id="p3" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Output:</label><textarea id="out_deploy" placeholder="NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   3/3     3            3           2m"></textarea></div></div>
+            <div class="screenshot-item"><h4>4️⃣ kubectl get pods (3 replicas)</h4><input type="file" id="ss4" accept="image/*" onchange="previewImg(this,'p4')"><img id="p4" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Output:</label><textarea id="out_pods" placeholder="NAME                               READY   STATUS
+nginx-deployment-xxx-abc   1/1     Running
+nginx-deployment-xxx-def   1/1     Running
+nginx-deployment-xxx-ghi   1/1     Running"></textarea></div></div>
+            <div class="screenshot-item"><h4>5️⃣ kubectl apply service</h4><input type="file" id="ss5" accept="image/*" onchange="previewImg(this,'p5')"><img id="p5" class="preview-img"></div>
+            <div class="screenshot-item"><h4>6️⃣ kubectl get services</h4><input type="file" id="ss6" accept="image/*" onchange="previewImg(this,'p6')"><img id="p6" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Output:</label><textarea id="out_svc" placeholder="NAME            TYPE       CLUSTER-IP     PORT(S)
+nginx-service   NodePort   10.x.x.x       80:30080/TCP"></textarea></div></div>
+            <div class="screenshot-item"><h4>7️⃣ Akses via Browser</h4><input type="file" id="ss7" accept="image/*" onchange="previewImg(this,'p7')"><img id="p7" class="preview-img"><div class="form-group" style="margin-top:10px"><label>URL:</label><input type="text" id="url_app" placeholder="http://192.168.49.2:30080"></div></div>
+            
+            <div class="screenshot-item"><h4>8️⃣ Self-Healing: Sebelum Delete</h4><input type="file" id="ss8a" accept="image/*" onchange="previewImg(this,'p8a')"><img id="p8a" class="preview-img"></div>
+            <div class="screenshot-item"><h4>8️⃣ Self-Healing: Delete Pod</h4><input type="file" id="ss8b" accept="image/*" onchange="previewImg(this,'p8b')"><img id="p8b" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Pod yang dihapus:</label><input type="text" id="pod_deleted" placeholder="nginx-deployment-xxx-abc"></div></div>
+            <div class="screenshot-item"><h4>8️⃣ Self-Healing: Setelah Delete (Pod baru muncul!)</h4><input type="file" id="ss8c" accept="image/*" onchange="previewImg(this,'p8c')"><img id="p8c" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Penjelasan:</label><textarea id="pjls_heal" placeholder="Pod baru otomatis dibuat untuk menggantikan yang dihapus"></textarea></div></div>
+            
+            <div class="screenshot-item"><h4>9️⃣ Scaling: Scale Up ke 5</h4><input type="file" id="ss9a" accept="image/*" onchange="previewImg(this,'p9a')"><img id="p9a" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Output (5 pods):</label><textarea id="out_scale5" placeholder="Harus ada 5 pods running"></textarea></div></div>
+            <div class="screenshot-item"><h4>9️⃣ Scaling: Scale Down ke 2</h4><input type="file" id="ss9b" accept="image/*" onchange="previewImg(this,'p9b')"><img id="p9b" class="preview-img"><div class="form-group" style="margin-top:10px"><label>Output (2 pods):</label><textarea id="out_scale2" placeholder="Harus ada 2 pods running"></textarea></div></div>
+        </div>
+
+        <div class="card">
+            <h2>⚠️ Kendala & Solusi</h2>
+            <div class="form-group"><label>Kendala:</label><textarea id="kendala" placeholder="Tidak ada kendala"></textarea></div>
+            <div class="form-group"><label>Solusi:</label><textarea id="solusi" placeholder="-"></textarea></div>
+        </div>
+
+        <div class="card">
+            <h2>💡 Kesimpulan</h2>
+            <textarea id="kesimpulan" style="min-height:150px" placeholder="- Deployment memudahkan mengelola replicas
+- Service expose aplikasi ke luar cluster
+- Kubernetes otomatis membuat pod baru (self-healing)
+- Scaling mudah dengan satu perintah"></textarea>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-secondary" onclick="preview()">👁️ Preview</button>
+            <button class="btn btn-primary" onclick="download()">📥 Download LAPORAN.md</button>
+        </div>
+        <div class="preview-section" id="previewSection"><h3 style="color:#00d4ff;margin-bottom:15px">📄 Preview</h3><div class="preview-content" id="previewContent"></div></div>
+    </div>
+    <div class="success-message" id="msg"></div>
+
+    <script>
+        document.getElementById('tanggal').valueAsDate=new Date();
+        function previewImg(i,id){const img=document.getElementById(id);if(i.files[0]){const r=new FileReader();r.onload=e=>{img.src=e.target.result;img.style.display='block'};r.readAsDataURL(i.files[0])}}
+        function v(id){return document.getElementById(id)?.value||''}
+        function c(id){return document.getElementById(id)?.checked?'✅ Sudah':'⬜ Belum'}
+
+        function generateMd(){
+            const tgl=v('tanggal')?new Date(v('tanggal')).toLocaleDateString('id-ID'):'[Tanggal]';
+            return `# 📝 Laporan Praktikum - Pertemuan 7
+
+## 🚀 Kubernetes Deployment & Service
+
+---
+
+## 👤 Identitas
+
+| Field | Isi |
+|-------|-----|
+| **Nama** | ${v('nama')||'[Nama]'} |
+| **NIM** | ${v('nim')||'[NIM]'} |
+| **Kelas** | ${v('kelas')||'[Kelas]'} |
+| **Tanggal** | ${tgl} |
+
+---
+
+## ✅ Checklist
+
+| No | Tugas | Status |
+|----|-------|--------|
+| 1 | Buat deployment.yaml | ${c('task1')} |
+| 2 | Buat service.yaml | ${c('task2')} |
+| 3 | Apply deployment (3 replicas) | ${c('task3')} |
+| 4 | Apply service NodePort | ${c('task4')} |
+| 5 | Test self-healing | ${c('task5')} |
+| 6 | Test scaling (5→2) | ${c('task6')} |
+| 7 | Screenshot lengkap | ${c('task7')} |
+
+---
+
+## 💻 Kode YAML
+
+### deployment.yaml
+\`\`\`yaml
+${v('kode_deploy')||'# deployment.yaml'}
+\`\`\`
+
+### service.yaml
+\`\`\`yaml
+${v('kode_service')||'# service.yaml'}
+\`\`\`
+
+---
+
+## 🖼️ Screenshot
+
+### 1️⃣ File YAML
+![YAML](ss/01-yaml-files.png)
+
+### 2️⃣ kubectl apply deployment
+![Apply Deploy](ss/02-apply-deployment.png)
+
+### 3️⃣ kubectl get deployments
+![Get Deploy](ss/03-get-deployments.png)
+\`\`\`
+${v('out_deploy')||'[Output]'}
+\`\`\`
+
+### 4️⃣ kubectl get pods (3 replicas)
+![Get Pods](ss/04-get-pods.png)
+\`\`\`
+${v('out_pods')||'[Output]'}
+\`\`\`
+
+### 5️⃣ kubectl apply service
+![Apply Svc](ss/05-apply-service.png)
+
+### 6️⃣ kubectl get services
+![Get Svc](ss/06-get-services.png)
+\`\`\`
+${v('out_svc')||'[Output]'}
+\`\`\`
+
+### 7️⃣ Akses via Browser
+![Browser](ss/07-browser-access.png)
+**URL:** \`${v('url_app')||'http://[IP]:[NodePort]'}\`
+
+---
+
+## 🔄 Self-Healing Test
+
+### Sebelum Delete
+![Before](ss/08a-before-delete.png)
+
+### Delete Pod
+![Delete](ss/08b-delete-pod.png)
+**Pod dihapus:** \`${v('pod_deleted')||'[nama-pod]'}\`
+
+### Setelah Delete (Pod baru otomatis dibuat!)
+![After](ss/08c-after-delete.png)
+\`\`\`
+${v('pjls_heal')||'[Penjelasan self-healing]'}
+\`\`\`
+
+---
+
+## 📈 Scaling Test
+
+### Scale Up ke 5 replicas
+![Scale5](ss/09a-scale-up.png)
+\`\`\`bash
+kubectl scale deployment nginx-deployment --replicas=5
+\`\`\`
+\`\`\`
+${v('out_scale5')||'[Output 5 pods]'}
+\`\`\`
+
+### Scale Down ke 2 replicas
+![Scale2](ss/09b-scale-down.png)
+\`\`\`bash
+kubectl scale deployment nginx-deployment --replicas=2
+\`\`\`
+\`\`\`
+${v('out_scale2')||'[Output 2 pods]'}
+\`\`\`
+
+---
+
+## ⚠️ Kendala & Solusi
+**Kendala:** ${v('kendala')||'Tidak ada'}
+**Solusi:** ${v('solusi')||'-'}
+
+---
+
+## 💡 Kesimpulan
+\`\`\`
+${v('kesimpulan')||'[Kesimpulan]'}
+\`\`\`
+
+---
+
+## 📊 Penilaian
+
+| Kriteria | Nilai |
+|----------|-------|
+| Deployment 3 replicas | /30 |
+| Service NodePort | /25 |
+| Self-healing | /25 |
+| Scaling | /10 |
+| Kesimpulan | /10 |
+| **Total** | **/100** |
+
+---
+<div align="center">📅 **Pertemuan 7** | [🏠 README](README.md)</div>
+`}
+
+        function preview(){document.getElementById('previewContent').textContent=generateMd();document.getElementById('previewSection').style.display='block'}
+        function download(){const b=new Blob([generateMd()],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='LAPORAN.md';a.click();const m=document.getElementById('msg');m.textContent='✅ Downloaded!';m.style.display='block';setTimeout(()=>m.style.display='none',3000)}
+
+        const fields=['nama','nim','kelas','tanggal','task1','task2','task3','task4','task5','task6','task7','kode_deploy','kode_service','out_deploy','out_pods','out_svc','url_app','pod_deleted','pjls_heal','out_scale5','out_scale2','kendala','solusi','kesimpulan'];
+        function save(){const d={};fields.forEach(f=>{const el=document.getElementById(f);if(el)d[f]=el.type==='checkbox'?el.checked:el.value});localStorage.setItem('laporan_p7',JSON.stringify(d))}
+        function load(){const s=localStorage.getItem('laporan_p7');if(s){const d=JSON.parse(s);fields.forEach(f=>{const el=document.getElementById(f);if(el)el.type==='checkbox'?el.checked=d[f]:el.value=d[f]||''})}}
+        document.querySelectorAll('input,textarea').forEach(el=>{el.addEventListener('change',save);el.addEventListener('input',save)});
+        load();
+    </script>
+</body>
+</html>

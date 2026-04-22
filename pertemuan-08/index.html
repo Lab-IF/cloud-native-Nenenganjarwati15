@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertemuan 8 - UTS Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+        .nav { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); padding: 15px 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1e293b; }
+        .nav-content { max-width: 1000px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
+        .nav a:hover { color: #ef4444; }
+        .nav-title { font-weight: 600; color: #f1f5f9; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 50px; padding: 40px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.1)); border-radius: 20px; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .header-badge { display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 20px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(90deg, #ef4444, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: #94a3b8; font-size: 1.1rem; }
+        .section { margin-bottom: 40px; }
+        .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; margin-bottom: 20px; color: #f1f5f9; }
+        .section-title i { color: #ef4444; }
+        .card { background: #1e293b; border-radius: 15px; padding: 25px; margin-bottom: 20px; border: 1px solid #334155; }
+        .card h3 { color: #f1f5f9; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .card h3 i { color: #ef4444; }
+        .code-block { background: #0f172a; border-radius: 12px; overflow: hidden; margin: 20px 0; border: 1px solid #334155; }
+        .code-header { background: #1e293b; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .code-header span { color: #94a3b8; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .code-header button { background: #334155; border: none; color: #94a3b8; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s; }
+        .code-header button:hover { background: #ef4444; color: white; }
+        .code-content { padding: 20px; overflow-x: auto; }
+        .code-content pre { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #e2e8f0; margin: 0; }
+        .code-content .comment { color: #6b7280; }
+        .code-content .keyword { color: #f59e0b; }
+        .code-content .string { color: #10b981; }
+        .code-content .key { color: #8b5cf6; }
+        .info-box { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .info-box.warning { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+        .info-box.success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
+        .info-box h4 { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: #ef4444; }
+        .info-box.warning h4 { color: #f59e0b; }
+        .info-box.success h4 { color: #10b981; }
+        .file-tree { background: #0f172a; border-radius: 12px; padding: 20px; border: 1px solid #334155; font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .file-tree .folder { color: #f59e0b; }
+        .file-tree .file { color: #10b981; }
+        .checklist { margin: 20px 0; }
+        .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 15px; background: #0f172a; border-radius: 10px; margin-bottom: 10px; border: 1px solid #334155; }
+        .checklist-item i { color: #ef4444; margin-top: 3px; }
+        .checklist-item span { flex: 1; }
+        .points { display: inline-block; background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; margin-left: 10px; }
+        .total-points { background: linear-gradient(135deg, #ef4444, #f59e0b); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0; }
+        .total-points h3 { font-size: 2rem; margin-bottom: 5px; }
+        .footer-nav { display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1e293b; }
+        .footer-nav a { display: flex; align-items: center; gap: 10px; color: #94a3b8; text-decoration: none; padding: 15px 25px; background: #1e293b; border-radius: 10px; transition: all 0.3s; }
+        .footer-nav a:hover { background: #ef4444; color: white; }
+        .deadline { background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.2)); border: 2px solid #ef4444; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; }
+        .deadline h4 { color: #ef4444; font-size: 1.2rem; }
+        @media (max-width: 768px) { .header h1 { font-size: 1.8rem; } }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="../pertemuan-07/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 7</a>
+            <span class="nav-title">Pertemuan 8 - UTS</span>
+            <a href="../index.html">Home <i class="fas fa-home"></i></a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <span class="header-badge">📝 UTS Project</span>
+            <h1>Final Project: Docker Compose</h1>
+            <p>Membangun aplikasi full-stack dengan Docker Compose</p>
+        </header>
+
+        <div class="deadline">
+            <h4><i class="fas fa-clock"></i> Deadline: Sesuai Jadwal UTS</h4>
+            <p style="color: #94a3b8; margin-top: 10px;">Kumpulkan sebelum waktu yang ditentukan</p>
+        </div>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-bullseye"></i> Tujuan Project</h2>
+            <div class="card">
+                <p>Membuat aplikasi <strong>Todo List</strong> lengkap menggunakan:</p>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li>Frontend/Backend: Flask (Python)</li>
+                    <li>Database: MySQL</li>
+                    <li>Orchestration: Docker Compose</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-folder-tree"></i> Struktur Project</h2>
+            <div class="file-tree">
+                <span class="folder">📁 uts-[nim]/</span><br>
+                &nbsp;&nbsp;├── <span class="file">📄 docker-compose.yml</span><br>
+                &nbsp;&nbsp;├── <span class="file">📄 init.sql</span><br>
+                &nbsp;&nbsp;├── <span class="file">📄 README.md</span><br>
+                &nbsp;&nbsp;└── <span class="folder">📁 app/</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">📄 Dockerfile</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">📄 requirements.txt</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">📄 app.py</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder">📁 templates/</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">📄 index.html</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-code"></i> Template Kode</h2>
+
+            <div class="card">
+                <h3><i class="fas fa-file-alt"></i> docker-compose.yml</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-file-alt"></i> docker-compose.yml</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="key">version:</span> <span class="string">'3.8'</span>
+
+<span class="key">services:</span>
+  <span class="key">database:</span>
+    <span class="key">image:</span> mysql:8.0
+    <span class="key">environment:</span>
+      <span class="key">MYSQL_ROOT_PASSWORD:</span> rahasia123
+      <span class="key">MYSQL_DATABASE:</span> todoapp
+    <span class="key">volumes:</span>
+      - db-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    <span class="key">healthcheck:</span>
+      <span class="key">test:</span> [<span class="string">"CMD"</span>, <span class="string">"mysqladmin"</span>, <span class="string">"ping"</span>, <span class="string">"-h"</span>, <span class="string">"localhost"</span>]
+      <span class="key">interval:</span> 10s
+      <span class="key">timeout:</span> 5s
+      <span class="key">retries:</span> 5
+
+  <span class="key">web:</span>
+    <span class="key">build:</span> ./app
+    <span class="key">ports:</span>
+      - <span class="string">"5000:5000"</span>
+    <span class="key">environment:</span>
+      <span class="key">DB_HOST:</span> database
+      <span class="key">DB_USER:</span> root
+      <span class="key">DB_PASSWORD:</span> rahasia123
+      <span class="key">DB_NAME:</span> todoapp
+    <span class="key">depends_on:</span>
+      <span class="key">database:</span>
+        <span class="key">condition:</span> service_healthy
+
+<span class="key">volumes:</span>
+  <span class="key">db-data:</span></pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-database"></i> init.sql</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-database"></i> init.sql</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="keyword">CREATE TABLE IF NOT EXISTS</span> todos (
+    id <span class="keyword">INT AUTO_INCREMENT PRIMARY KEY</span>,
+    task <span class="keyword">VARCHAR</span>(255) <span class="keyword">NOT NULL</span>,
+    done <span class="keyword">BOOLEAN DEFAULT</span> <span class="keyword">FALSE</span>,
+    created_at <span class="keyword">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>
+);
+
+<span class="comment">-- Data contoh</span>
+<span class="keyword">INSERT INTO</span> todos (task) <span class="keyword">VALUES</span> 
+    (<span class="string">'Belajar Docker'</span>),
+    (<span class="string">'Buat project UTS'</span>),
+    (<span class="string">'Presentasi'</span>);</pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fab fa-python"></i> app/app.py</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fab fa-python"></i> app.py</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="keyword">import</span> os
+<span class="keyword">import</span> mysql.connector
+<span class="keyword">from</span> flask <span class="keyword">import</span> Flask, render_template, request, redirect, url_for
+
+app = Flask(__name__)
+
+<span class="keyword">def</span> get_db():
+    <span class="keyword">return</span> mysql.connector.connect(
+        host=os.environ.get(<span class="string">'DB_HOST'</span>, <span class="string">'localhost'</span>),
+        user=os.environ.get(<span class="string">'DB_USER'</span>, <span class="string">'root'</span>),
+        password=os.environ.get(<span class="string">'DB_PASSWORD'</span>, <span class="string">'rahasia123'</span>),
+        database=os.environ.get(<span class="string">'DB_NAME'</span>, <span class="string">'todoapp'</span>)
+    )
+
+<span class="keyword">@app.route</span>(<span class="string">'/'</span>)
+<span class="keyword">def</span> index():
+    db = get_db()
+    cursor = db.cursor(dictionary=<span class="keyword">True</span>)
+    cursor.execute(<span class="string">'SELECT * FROM todos ORDER BY created_at DESC'</span>)
+    todos = cursor.fetchall()
+    cursor.close()
+    db.close()
+    <span class="keyword">return</span> render_template(<span class="string">'index.html'</span>, todos=todos)
+
+<span class="keyword">@app.route</span>(<span class="string">'/add'</span>, methods=[<span class="string">'POST'</span>])
+<span class="keyword">def</span> add():
+    task = request.form.get(<span class="string">'task'</span>)
+    <span class="keyword">if</span> task:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(<span class="string">'INSERT INTO todos (task) VALUES (%s)'</span>, (task,))
+        db.commit()
+        cursor.close()
+        db.close()
+    <span class="keyword">return</span> redirect(url_for(<span class="string">'index'</span>))
+
+<span class="keyword">@app.route</span>(<span class="string">'/done/&lt;int:id&gt;'</span>)
+<span class="keyword">def</span> done(id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(<span class="string">'UPDATE todos SET done = NOT done WHERE id = %s'</span>, (id,))
+    db.commit()
+    cursor.close()
+    db.close()
+    <span class="keyword">return</span> redirect(url_for(<span class="string">'index'</span>))
+
+<span class="keyword">@app.route</span>(<span class="string">'/delete/&lt;int:id&gt;'</span>)
+<span class="keyword">def</span> delete(id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(<span class="string">'DELETE FROM todos WHERE id = %s'</span>, (id,))
+    db.commit()
+    cursor.close()
+    db.close()
+    <span class="keyword">return</span> redirect(url_for(<span class="string">'index'</span>))
+
+<span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:
+    app.run(host=<span class="string">'0.0.0.0'</span>, port=5000, debug=<span class="keyword">True</span>)</pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-file-alt"></i> app/requirements.txt</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-file-alt"></i> requirements.txt</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre>flask==3.0.0
+mysql-connector-python==8.2.0</pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fab fa-docker"></i> app/Dockerfile</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fab fa-docker"></i> Dockerfile</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="keyword">FROM</span> python:3.11-slim
+
+<span class="keyword">WORKDIR</span> /app
+
+<span class="keyword">COPY</span> requirements.txt .
+<span class="keyword">RUN</span> pip install --no-cache-dir -r requirements.txt
+
+<span class="keyword">COPY</span> . .
+
+<span class="keyword">EXPOSE</span> 5000
+
+<span class="keyword">CMD</span> [<span class="string">"python"</span>, <span class="string">"app.py"</span>]</pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fab fa-html5"></i> app/templates/index.html</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fab fa-html5"></i> index.html</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment">&lt;!-- Buat tampilan yang menarik! --&gt;</span>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Todo App - [Nama Anda]&lt;/title&gt;
+    &lt;style&gt;
+        <span class="comment">/* Tambahkan CSS styling di sini */</span>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; }
+        .todo-item { padding: 10px; border: 1px solid #ddd; margin: 5px 0; display: flex; justify-content: space-between; }
+        .done { text-decoration: line-through; color: #888; }
+        form { display: flex; gap: 10px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 10px; }
+        button { padding: 10px 20px; cursor: pointer; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;📝 Todo List&lt;/h1&gt;
+    &lt;p&gt;Nama: [Nama Anda] | NIM: [NIM Anda]&lt;/p&gt;
+    
+    &lt;form action="/add" method="POST"&gt;
+        &lt;input type="text" name="task" placeholder="Tambah tugas baru..." required&gt;
+        &lt;button type="submit"&gt;Tambah&lt;/button&gt;
+    &lt;/form&gt;
+    
+    &lt;div&gt;
+        {% for todo in todos %}
+        &lt;div class="todo-item {% if todo.done %}done{% endif %}"&gt;
+            &lt;span&gt;{{ todo.task }}&lt;/span&gt;
+            &lt;div&gt;
+                &lt;a href="/done/{{ todo.id }}"&gt;{% if todo.done %}↩️{% else %}✅{% endif %}&lt;/a&gt;
+                &lt;a href="/delete/{{ todo.id }}"&gt;🗑️&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        {% endfor %}
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-list-check"></i> Kriteria Penilaian</h2>
+            
+            <div class="checklist">
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Docker Compose berjalan dengan benar (web + database) <span class="points">20</span></span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Fitur CRUD lengkap (Create, Read, Update status, Delete) <span class="points">30</span></span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Data tersimpan di database (persistent dengan volume) <span class="points">15</span></span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Tampilan UI yang rapi dan menarik <span class="points">15</span></span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>README.md berisi: Nama, NIM, screenshot, cara menjalankan <span class="points">10</span></span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Kode bersih dan ada komentar <span class="points">10</span></span>
+                </div>
+            </div>
+
+            <div class="total-points">
+                <h3>Total: 100 Poin</h3>
+                <p>Minimum lulus: 60 poin</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-paper-plane"></i> Cara Pengumpulan</h2>
+            <div class="card">
+                <ol style="padding-left: 20px;">
+                    <li>Buat repository GitHub dengan nama: <code>uts-cloud-native-[nim]</code></li>
+                    <li>Push semua file ke repository</li>
+                    <li>Pastikan README.md berisi:
+                        <ul style="padding-left: 20px;">
+                            <li>Nama dan NIM</li>
+                            <li>Screenshot aplikasi berjalan</li>
+                            <li>Cara menjalankan (<code>docker-compose up -d</code>)</li>
+                        </ul>
+                    </li>
+                    <li>Kirim link repository ke dosen</li>
+                </ol>
+            </div>
+
+            <div class="info-box warning">
+                <h4><i class="fas fa-exclamation-triangle"></i> Penting!</h4>
+                <ul style="padding-left: 20px;">
+                    <li>Jangan copy-paste penuh dari template, modifikasi sesuai kreativitas</li>
+                    <li>Pastikan aplikasi bisa dijalankan dengan <code>docker-compose up -d</code></li>
+                    <li>Test di komputer lain atau hapus semua container/image dulu sebelum submit</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-terminal"></i> Quick Test</h2>
+            <div class="code-block">
+                <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                <div class="code-content"><pre><span class="comment"># Jalankan project</span>
+docker-compose up -d --build
+
+<span class="comment"># Lihat logs</span>
+docker-compose logs -f
+
+<span class="comment"># Buka browser</span>
+<span class="comment"># http://localhost:5000</span>
+
+<span class="comment"># Stop semua</span>
+docker-compose down
+
+<span class="comment"># Stop dan hapus data</span>
+docker-compose down -v</pre></div>
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <a href="../pertemuan-07/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 7</a>
+            <a href="../index.html">Home <i class="fas fa-home"></i></a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code);
+            button.textContent = 'Copied!';
+            setTimeout(() => button.textContent = 'Copy', 2000);
+        }
+    </script>
+</body>
+</html>

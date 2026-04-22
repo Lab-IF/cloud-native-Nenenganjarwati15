@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertemuan 4 - Docker Compose</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+        .nav { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); padding: 15px 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1e293b; }
+        .nav-content { max-width: 1000px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
+        .nav a:hover { color: #f59e0b; }
+        .nav-title { font-weight: 600; color: #f1f5f9; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 50px; padding: 40px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0, 212, 255, 0.1)); border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .header-badge { display: inline-block; background: #f59e0b; color: #0f172a; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 20px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(90deg, #f59e0b, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: #94a3b8; font-size: 1.1rem; }
+        .section { margin-bottom: 40px; }
+        .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; margin-bottom: 20px; color: #f1f5f9; }
+        .section-title i { color: #f59e0b; }
+        .card { background: #1e293b; border-radius: 15px; padding: 25px; margin-bottom: 20px; border: 1px solid #334155; }
+        .card h3 { color: #f1f5f9; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .card h3 i { color: #f59e0b; }
+        .objectives { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .objective-item { background: rgba(245, 158, 11, 0.1); padding: 15px 20px; border-radius: 10px; border-left: 3px solid #f59e0b; display: flex; align-items: center; gap: 12px; }
+        .objective-item i { color: #f59e0b; }
+        .code-block { background: #0f172a; border-radius: 12px; overflow: hidden; margin: 20px 0; border: 1px solid #334155; }
+        .code-header { background: #1e293b; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .code-header span { color: #94a3b8; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .code-header button { background: #334155; border: none; color: #94a3b8; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s; }
+        .code-header button:hover { background: #f59e0b; color: #0f172a; }
+        .code-content { padding: 20px; overflow-x: auto; }
+        .code-content pre { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #e2e8f0; margin: 0; }
+        .code-content .comment { color: #6b7280; }
+        .code-content .keyword { color: #f59e0b; }
+        .code-content .string { color: #10b981; }
+        .code-content .key { color: #7c3aed; }
+        .diagram { background: #0f172a; border-radius: 12px; padding: 30px; margin: 20px 0; border: 1px solid #334155; text-align: center; overflow-x: auto; }
+        .diagram pre { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #94a3b8; display: inline-block; text-align: left; }
+        .info-box { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .info-box h4 { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: #f59e0b; }
+        .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .compare-box { background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
+        .compare-box.bad { border-top: 3px solid #ef4444; }
+        .compare-box.good { border-top: 3px solid #10b981; }
+        .compare-box h4 { margin-bottom: 15px; }
+        .compare-box.bad h4 { color: #ef4444; }
+        .compare-box.good h4 { color: #10b981; }
+        .table-container { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 12px; overflow: hidden; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #0f172a; color: #f59e0b; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        .task-card { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0, 212, 255, 0.1)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 15px; padding: 25px; margin: 20px 0; }
+        .task-card h4 { color: #f59e0b; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .task-points { background: #f59e0b; color: #0f172a; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; }
+        .footer-nav { display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1e293b; }
+        .footer-nav a { display: flex; align-items: center; gap: 10px; color: #94a3b8; text-decoration: none; padding: 15px 25px; background: #1e293b; border-radius: 10px; transition: all 0.3s; }
+        .footer-nav a:hover { background: #f59e0b; color: #0f172a; }
+        .file-tree { background: #0f172a; border-radius: 12px; padding: 20px; border: 1px solid #334155; font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .file-tree .folder { color: #f59e0b; }
+        .file-tree .file { color: #10b981; }
+        @media (max-width: 768px) { .header h1 { font-size: 1.8rem; } .comparison { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="../pertemuan-03/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 3</a>
+            <span class="nav-title">Pertemuan 4</span>
+            <a href="../pertemuan-05/index.html">Pertemuan 5 <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <span class="header-badge">Minggu 4</span>
+            <h1>🎼 Docker Compose</h1>
+            <p>Mengelola multiple container dengan satu file konfigurasi</p>
+        </header>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-bullseye"></i> Tujuan Pembelajaran</h2>
+            <div class="objectives">
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Memahami apa itu Docker Compose</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Menulis file docker-compose.yml</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Menjalankan multi-container apps</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Menghubungkan container</span></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-book"></i> Teori</h2>
+
+            <div class="card">
+                <h3><i class="fas fa-layer-group"></i> Apa itu Docker Compose?</h3>
+                <p>Docker Compose adalah tool untuk <strong>mendefinisikan dan menjalankan multiple container</strong> menggunakan satu file konfigurasi.</p>
+                
+                <div class="comparison">
+                    <div class="compare-box bad">
+                        <h4>😓 Tanpa Docker Compose</h4>
+                        <pre style="font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #94a3b8;">docker run -d --name db mysql
+docker run -d --name backend --link db mybackend
+docker run -d --name frontend -p 80:80 myfrontend</pre>
+                    </div>
+                    <div class="compare-box good">
+                        <h4>🎉 Dengan Docker Compose</h4>
+                        <pre style="font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #94a3b8;">docker-compose up -d
+
+# Selesai! Semua container jalan!</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-file-code"></i> Struktur docker-compose.yml</h3>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-file-alt"></i> docker-compose.yml</span></div>
+                    <div class="code-content"><pre><span class="key">version:</span> <span class="string">'3.8'</span>            <span class="comment"># Versi format file</span>
+
+<span class="key">services:</span>                  <span class="comment"># Daftar container</span>
+  <span class="key">web:</span>                     <span class="comment"># Nama service</span>
+    <span class="key">image:</span> nginx           <span class="comment"># Image yang digunakan</span>
+    <span class="key">ports:</span>
+      - <span class="string">"8080:80"</span>         <span class="comment"># Port mapping</span>
+  
+  <span class="key">database:</span>
+    <span class="key">image:</span> mysql
+    <span class="key">environment:</span>           <span class="comment"># Environment variables</span>
+      <span class="key">MYSQL_ROOT_PASSWORD:</span> secret</pre></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-terminal"></i> Perintah Docker Compose</h3>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Perintah</th><th>Fungsi</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>docker-compose up</code></td><td>Jalankan semua service</td></tr>
+                            <tr><td><code>docker-compose up -d</code></td><td>Jalankan di background</td></tr>
+                            <tr><td><code>docker-compose down</code></td><td>Stop dan hapus semua</td></tr>
+                            <tr><td><code>docker-compose ps</code></td><td>Lihat status service</td></tr>
+                            <tr><td><code>docker-compose logs</code></td><td>Lihat logs</td></tr>
+                            <tr><td><code>docker-compose logs -f</code></td><td>Follow logs</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-laptop-code"></i> Praktikum</h2>
+
+            <div class="card">
+                <h3><i class="fab fa-wordpress"></i> Praktik 1: WordPress + MySQL</h3>
+                
+                <div class="file-tree">
+                    <span class="folder">📁 wordpress-project/</span><br>
+                    &nbsp;&nbsp;└── <span class="file">📄 docker-compose.yml</span>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-file-alt"></i> docker-compose.yml</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="key">version:</span> <span class="string">'3.8'</span>
+
+<span class="key">services:</span>
+  <span class="comment"># Database MySQL</span>
+  <span class="key">database:</span>
+    <span class="key">image:</span> mysql:8.0
+    <span class="key">environment:</span>
+      <span class="key">MYSQL_ROOT_PASSWORD:</span> rahasia123
+      <span class="key">MYSQL_DATABASE:</span> wordpress
+      <span class="key">MYSQL_USER:</span> wpuser
+      <span class="key">MYSQL_PASSWORD:</span> wppassword
+    <span class="key">volumes:</span>
+      - db-data:/var/lib/mysql
+
+  <span class="comment"># WordPress</span>
+  <span class="key">wordpress:</span>
+    <span class="key">image:</span> wordpress:latest
+    <span class="key">ports:</span>
+      - <span class="string">"8080:80"</span>
+    <span class="key">environment:</span>
+      <span class="key">WORDPRESS_DB_HOST:</span> database
+      <span class="key">WORDPRESS_DB_USER:</span> wpuser
+      <span class="key">WORDPRESS_DB_PASSWORD:</span> wppassword
+      <span class="key">WORDPRESS_DB_NAME:</span> wordpress
+    <span class="key">depends_on:</span>
+      - database
+
+<span class="key">volumes:</span>
+  <span class="key">db-data:</span></pre></div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Jalankan</span>
+docker-compose up -d
+
+<span class="comment"># Lihat status</span>
+docker-compose ps
+
+<span class="comment"># Lihat logs</span>
+docker-compose logs -f</pre></div>
+                </div>
+
+                <div class="info-box">
+                    <h4><i class="fas fa-globe"></i> Buka Browser</h4>
+                    <p>Akses <strong>http://localhost:8080</strong> - WordPress siap disetup!</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fab fa-python"></i> Praktik 2: Flask + MySQL</h3>
+                
+                <div class="file-tree">
+                    <span class="folder">📁 flask-mysql/</span><br>
+                    &nbsp;&nbsp;├── <span class="file">📄 docker-compose.yml</span><br>
+                    &nbsp;&nbsp;├── <span class="file">📄 init.sql</span><br>
+                    &nbsp;&nbsp;└── <span class="folder">📁 app/</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">📄 Dockerfile</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">📄 requirements.txt</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">📄 app.py</span>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-file-alt"></i> docker-compose.yml</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="key">version:</span> <span class="string">'3.8'</span>
+
+<span class="key">services:</span>
+  <span class="key">database:</span>
+    <span class="key">image:</span> mysql:8.0
+    <span class="key">environment:</span>
+      <span class="key">MYSQL_ROOT_PASSWORD:</span> rahasia
+      <span class="key">MYSQL_DATABASE:</span> myapp
+    <span class="key">volumes:</span>
+      - db-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  <span class="key">web:</span>
+    <span class="key">build:</span> ./app
+    <span class="key">ports:</span>
+      - <span class="string">"5000:5000"</span>
+    <span class="key">environment:</span>
+      <span class="key">DB_HOST:</span> database
+      <span class="key">DB_USER:</span> root
+      <span class="key">DB_PASSWORD:</span> rahasia
+      <span class="key">DB_NAME:</span> myapp
+    <span class="key">depends_on:</span>
+      - database
+
+<span class="key">volumes:</span>
+  <span class="key">db-data:</span></pre></div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Build dan jalankan</span>
+docker-compose up -d --build
+
+<span class="comment"># Stop semua</span>
+docker-compose down
+
+<span class="comment"># Stop dan hapus volume (data hilang)</span>
+docker-compose down -v</pre></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-tasks"></i> Tugas Praktikum</h2>
+
+            <div class="task-card">
+                <h4><i class="fas fa-clipboard-check"></i> Tugas: Aplikasi Todo List <span class="task-points">100 poin</span></h4>
+                <p>Buat aplikasi Todo List dengan Docker Compose:</p>
+                <ol style="margin: 15px 0; padding-left: 20px;">
+                    <li>Aplikasi web Flask dengan fitur:
+                        <ul>
+                            <li>Halaman utama menampilkan semua todo</li>
+                            <li>Endpoint <code>/add/&lt;task&gt;</code> untuk menambah</li>
+                            <li>Endpoint <code>/delete/&lt;id&gt;</code> untuk menghapus</li>
+                            <li>Endpoint <code>/done/&lt;id&gt;</code> untuk menandai selesai</li>
+                        </ul>
+                    </li>
+                    <li>Database MySQL dengan volume untuk persist data</li>
+                    <li>Docker Compose untuk orchestration</li>
+                </ol>
+            </div>
+        </section>
+
+        <div class="footer-nav">
+            <a href="../pertemuan-03/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 3</a>
+            <a href="../pertemuan-05/index.html">Pertemuan 5 <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code);
+            button.textContent = 'Copied!';
+            setTimeout(() => button.textContent = 'Copy', 2000);
+        }
+    </script>
+</body>
+</html>

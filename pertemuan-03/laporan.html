@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Laporan - Pertemuan 3</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 10px; font-size: 2rem; }
+        h1 span { color: #00d4ff; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; }
+        .card {
+            background: rgba(255,255,255,0.05); border-radius: 15px; padding: 25px;
+            margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card h2 { color: #00d4ff; margin-bottom: 20px; font-size: 1.3rem; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #ccc; font-size: 0.9rem; }
+        input[type="text"], input[type="date"], textarea {
+            width: 100%; padding: 12px 15px; border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px; background: rgba(0,0,0,0.3); color: #fff;
+            font-size: 1rem; font-family: inherit;
+        }
+        input:focus, textarea:focus { outline: none; border-color: #00d4ff; }
+        textarea { min-height: 100px; resize: vertical; }
+        textarea.code { font-family: 'Courier New', monospace; min-height: 120px; }
+        .checkbox-group {
+            display: flex; align-items: center; gap: 10px; padding: 10px;
+            background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 10px;
+        }
+        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; }
+        .checkbox-group label { margin: 0; flex: 1; }
+        .screenshot-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .screenshot-item h4 { color: #ffd700; margin-bottom: 10px; }
+        input[type="file"] {
+            width: 100%; padding: 10px; background: rgba(0,212,255,0.1);
+            border: 2px dashed rgba(0,212,255,0.5); border-radius: 8px;
+        }
+        .preview-img { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px; display: none; }
+        .btn {
+            padding: 15px 30px; border: none; border-radius: 8px; font-size: 1rem;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: linear-gradient(135deg, #00d4ff, #0099cc); color: #000; font-weight: bold; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .buttons { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
+        .preview-section { background: #0d1117; border-radius: 10px; padding: 20px; margin-top: 20px; display: none; }
+        .preview-content {
+            background: #161b22; padding: 20px; border-radius: 8px; white-space: pre-wrap;
+            font-family: 'Courier New', monospace; font-size: 0.85rem; max-height: 400px;
+            overflow-y: auto; color: #c9d1d9;
+        }
+        .info-box { background: rgba(0,212,255,0.1); border-left: 4px solid #00d4ff; padding: 15px; margin-bottom: 20px; }
+        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .success-message {
+            position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000; padding: 15px 25px; border-radius: 10px; font-weight: bold; display: none; z-index: 1000;
+        }
+        .nav-link { text-align: center; margin-bottom: 20px; }
+        .nav-link a { color: #00d4ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-link">
+            <a href="README.md">📖 Materi</a> | <a href="index.html">🌐 Web</a> | <a href="../index.html">🏠 Home</a>
+        </div>
+
+        <h1>📝 Form Laporan <span>Pertemuan 3</span></h1>
+        <p class="subtitle">Docker Volume & Port Mapping</p>
+
+        <div class="info-box">
+            <p style="color:#aaa">💡 Isi form → Download LAPORAN.md → Simpan screenshot di folder <code>ss/</code></p>
+        </div>
+
+        <!-- Identitas -->
+        <div class="card">
+            <h2>👤 Identitas Mahasiswa</h2>
+            <div class="row">
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="nama" placeholder="Budi Santoso">
+                </div>
+                <div class="form-group">
+                    <label>NIM</label>
+                    <input type="text" id="nim" placeholder="12345678">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Kelas</label>
+                    <input type="text" id="kelas" placeholder="TI-3A">
+                </div>
+                <div class="form-group">
+                    <label>Tanggal Praktikum</label>
+                    <input type="date" id="tanggal">
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist -->
+        <div class="card">
+            <h2>✅ Checklist Tugas</h2>
+            <div class="checkbox-group"><input type="checkbox" id="task1"><label for="task1">Jalankan MySQL dengan volume</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task2"><label for="task2">Buat tabel mahasiswa</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task3"><label for="task3">Insert minimal 3 data</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task4"><label for="task4">Test persistensi data</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="task5"><label for="task5">Screenshot semua hasil</label></div>
+        </div>
+
+        <!-- Perintah -->
+        <div class="card">
+            <h2>💻 Perintah yang Dijalankan</h2>
+            <div class="form-group">
+                <label>🐬 Perintah Docker Run MySQL:</label>
+                <textarea id="cmd_mysql" class="code" placeholder="docker run -d \
+  --name mysql-db \
+  -e MYSQL_ROOT_PASSWORD=rahasia123 \
+  -e MYSQL_DATABASE=praktikum \
+  -v mysql-data:/var/lib/mysql \
+  -p 3306:3306 \
+  mysql:8.0"></textarea>
+            </div>
+            <div class="form-group">
+                <label>📝 SQL Commands:</label>
+                <textarea id="sql_cmd" class="code" placeholder="USE praktikum;
+
+CREATE TABLE mahasiswa (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100),
+    nim VARCHAR(20)
+);
+
+INSERT INTO mahasiswa (nama, nim) VALUES ('Budi', '12345');
+INSERT INTO mahasiswa (nama, nim) VALUES ('Ani', '12346');
+INSERT INTO mahasiswa (nama, nim) VALUES ('Citra', '12347');
+
+SELECT * FROM mahasiswa;"></textarea>
+            </div>
+        </div>
+
+        <!-- Screenshots -->
+        <div class="card">
+            <h2>🖼️ Screenshot</h2>
+            
+            <div class="screenshot-item">
+                <h4>1️⃣ Docker Volume List</h4>
+                <input type="file" id="ss1" accept="image/*" onchange="previewImage(this,'preview1')">
+                <img id="preview1" class="preview-img">
+                <div class="form-group" style="margin-top:10px">
+                    <label>Penjelasan:</label>
+                    <textarea id="pjls1" placeholder="Volume mysql-data terlihat di daftar"></textarea>
+                </div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>2️⃣ MySQL Container Running</h4>
+                <input type="file" id="ss2" accept="image/*" onchange="previewImage(this,'preview2')">
+                <img id="preview2" class="preview-img">
+                <div class="form-group" style="margin-top:10px"><label>Penjelasan:</label><textarea id="pjls2" placeholder="Container mysql-db berjalan"></textarea></div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>3️⃣ Create Table</h4>
+                <input type="file" id="ss3" accept="image/*" onchange="previewImage(this,'preview3')">
+                <img id="preview3" class="preview-img">
+                <div class="form-group" style="margin-top:10px"><label>Penjelasan:</label><textarea id="pjls3" placeholder="Tabel mahasiswa berhasil dibuat"></textarea></div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>4️⃣ Insert Data</h4>
+                <input type="file" id="ss4" accept="image/*" onchange="previewImage(this,'preview4')">
+                <img id="preview4" class="preview-img">
+                <div class="form-group" style="margin-top:10px"><label>Penjelasan:</label><textarea id="pjls4" placeholder="3 data berhasil dimasukkan"></textarea></div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>5️⃣ Select Data (Sebelum Restart)</h4>
+                <input type="file" id="ss5" accept="image/*" onchange="previewImage(this,'preview5')">
+                <img id="preview5" class="preview-img">
+                <div class="form-group" style="margin-top:10px"><label>Hasil SELECT:</label><textarea id="hasil_before" placeholder="+----+-------+-------+
+| id | nama  | nim   |
++----+-------+-------+
+| 1  | Budi  | 12345 |
+| 2  | Ani   | 12346 |
+| 3  | Citra | 12347 |
++----+-------+-------+"></textarea></div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>6️⃣ Stop & Remove Container</h4>
+                <input type="file" id="ss6" accept="image/*" onchange="previewImage(this,'preview6')">
+                <img id="preview6" class="preview-img">
+            </div>
+
+            <div class="screenshot-item">
+                <h4>7️⃣ Jalankan Ulang Container</h4>
+                <input type="file" id="ss7" accept="image/*" onchange="previewImage(this,'preview7')">
+                <img id="preview7" class="preview-img">
+            </div>
+
+            <div class="screenshot-item">
+                <h4>8️⃣ Select Data (Setelah Restart) - BUKTI PERSISTENSI</h4>
+                <input type="file" id="ss8" accept="image/*" onchange="previewImage(this,'preview8')">
+                <img id="preview8" class="preview-img">
+                <div class="form-group" style="margin-top:10px"><label>Hasil SELECT (harus sama!):</label><textarea id="hasil_after" placeholder="Data harus masih ada setelah restart!"></textarea></div>
+            </div>
+        </div>
+
+        <!-- Kendala -->
+        <div class="card">
+            <h2>⚠️ Kendala & Solusi</h2>
+            <div class="form-group"><label>Kendala:</label><textarea id="kendala" placeholder="Tidak ada kendala"></textarea></div>
+            <div class="form-group"><label>Solusi:</label><textarea id="solusi" placeholder="-"></textarea></div>
+        </div>
+
+        <!-- Kesimpulan -->
+        <div class="card">
+            <h2>💡 Kesimpulan</h2>
+            <textarea id="kesimpulan" style="min-height:150px" placeholder="- Volume Docker menyimpan data di luar container
+- Data tetap ada meskipun container dihapus
+- Port mapping memungkinkan akses dari luar container
+- Persistensi data penting untuk database"></textarea>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-secondary" onclick="previewMarkdown()">👁️ Preview</button>
+            <button class="btn btn-primary" onclick="downloadMarkdown()">📥 Download LAPORAN.md</button>
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <h3>📄 Preview</h3>
+            <div class="preview-content" id="previewContent"></div>
+        </div>
+    </div>
+
+    <div class="success-message" id="successMsg"></div>
+
+    <script>
+        document.getElementById('tanggal').valueAsDate = new Date();
+        function previewImage(input, id) {
+            const img = document.getElementById(id);
+            if(input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { img.src = e.target.result; img.style.display = 'block'; };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function generateMarkdown() {
+            const v = id => document.getElementById(id)?.value || '';
+            const c = id => document.getElementById(id)?.checked ? '✅ Sudah' : '⬜ Belum';
+            const tgl = v('tanggal') ? new Date(v('tanggal')).toLocaleDateString('id-ID') : '[Tanggal]';
+
+            return `# 📝 Laporan Praktikum - Pertemuan 3
+
+## 💾 Docker Volume & Port Mapping
+
+---
+
+## 👤 Identitas Mahasiswa
+
+| Field | Isi |
+|-------|-----|
+| **Nama** | ${v('nama') || '[Nama]'} |
+| **NIM** | ${v('nim') || '[NIM]'} |
+| **Kelas** | ${v('kelas') || '[Kelas]'} |
+| **Tanggal** | ${tgl} |
+
+---
+
+## ✅ Checklist Tugas
+
+| No | Tugas | Status |
+|----|-------|--------|
+| 1 | Jalankan MySQL dengan volume | ${c('task1')} |
+| 2 | Buat tabel mahasiswa | ${c('task2')} |
+| 3 | Insert minimal 3 data | ${c('task3')} |
+| 4 | Test persistensi data | ${c('task4')} |
+| 5 | Screenshot semua hasil | ${c('task5')} |
+
+---
+
+## 💻 Perintah yang Dijalankan
+
+### 🐬 Docker Run MySQL
+\`\`\`bash
+${v('cmd_mysql') || 'docker run -d --name mysql-db ...'}
+\`\`\`
+
+### 📝 SQL Commands
+\`\`\`sql
+${v('sql_cmd') || '-- SQL commands'}
+\`\`\`
+
+---
+
+## 🖼️ Screenshot Hasil
+
+### 1️⃣ Docker Volume List
+![Volume List](ss/01-volume-list.png)
+\`\`\`
+${v('pjls1') || '[Penjelasan]'}
+\`\`\`
+
+### 2️⃣ MySQL Container Running
+![MySQL Running](ss/02-mysql-running.png)
+\`\`\`
+${v('pjls2') || '[Penjelasan]'}
+\`\`\`
+
+### 3️⃣ Create Table
+![Create Table](ss/03-create-table.png)
+\`\`\`
+${v('pjls3') || '[Penjelasan]'}
+\`\`\`
+
+### 4️⃣ Insert Data
+![Insert Data](ss/04-insert-data.png)
+\`\`\`
+${v('pjls4') || '[Penjelasan]'}
+\`\`\`
+
+### 5️⃣ Select Data (Sebelum Restart)
+![Select Before](ss/05-select-before.png)
+\`\`\`
+${v('hasil_before') || '[Hasil SELECT]'}
+\`\`\`
+
+### 6️⃣ Stop & Remove Container
+![Stop Remove](ss/06-stop-remove.png)
+
+### 7️⃣ Jalankan Ulang Container
+![Restart](ss/07-restart-container.png)
+
+### 8️⃣ Select Data (Setelah Restart) - BUKTI PERSISTENSI ✅
+![Select After](ss/08-select-after.png)
+\`\`\`
+${v('hasil_after') || '[Data harus masih ada!]'}
+\`\`\`
+
+---
+
+## ⚠️ Kendala & Solusi
+
+**Kendala:**
+\`\`\`
+${v('kendala') || 'Tidak ada kendala'}
+\`\`\`
+
+**Solusi:**
+\`\`\`
+${v('solusi') || '-'}
+\`\`\`
+
+---
+
+## 💡 Kesimpulan
+
+\`\`\`
+${v('kesimpulan') || '[Kesimpulan]'}
+\`\`\`
+
+---
+
+## 📊 Penilaian
+
+| Kriteria | Nilai |
+|----------|-------|
+| MySQL dengan volume | /30 |
+| Tabel & data dibuat | /25 |
+| Bukti data persist | /25 |
+| Screenshot lengkap | /10 |
+| Kesimpulan | /10 |
+| **Total** | **/100** |
+
+---
+
+<div align="center">
+
+📅 **Pertemuan 3** | [🏠 README](README.md)
+
+</div>
+`;
+        }
+
+        function previewMarkdown() {
+            document.getElementById('previewContent').textContent = generateMarkdown();
+            document.getElementById('previewSection').style.display = 'block';
+        }
+
+        function downloadMarkdown() {
+            const blob = new Blob([generateMarkdown()], {type:'text/markdown'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'LAPORAN.md';
+            a.click();
+            const msg = document.getElementById('successMsg');
+            msg.textContent = '✅ LAPORAN.md downloaded!';
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        }
+
+        // Auto-save
+        const fields = ['nama','nim','kelas','tanggal','task1','task2','task3','task4','task5','cmd_mysql','sql_cmd','pjls1','pjls2','pjls3','pjls4','hasil_before','hasil_after','kendala','solusi','kesimpulan'];
+        function save() {
+            const data = {};
+            fields.forEach(f => { const el = document.getElementById(f); if(el) data[f] = el.type === 'checkbox' ? el.checked : el.value; });
+            localStorage.setItem('laporan_p3', JSON.stringify(data));
+        }
+        function load() {
+            const saved = localStorage.getItem('laporan_p3');
+            if(saved) {
+                const data = JSON.parse(saved);
+                fields.forEach(f => { const el = document.getElementById(f); if(el) el.type === 'checkbox' ? el.checked = data[f] : el.value = data[f] || ''; });
+            }
+        }
+        document.querySelectorAll('input,textarea').forEach(el => { el.addEventListener('change', save); el.addEventListener('input', save); });
+        load();
+    </script>
+</body>
+</html>

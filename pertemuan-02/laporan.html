@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Laporan - Pertemuan 2</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 10px; font-size: 2rem; }
+        h1 span { color: #00d4ff; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card h2 {
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #ccc; font-size: 0.9rem; }
+        input[type="text"], input[type="date"], textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus { outline: none; border-color: #00d4ff; box-shadow: 0 0 10px rgba(0,212,255,0.3); }
+        textarea { min-height: 100px; resize: vertical; }
+        textarea.code { font-family: 'Courier New', monospace; min-height: 150px; }
+        .checkbox-group {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 10px;
+        }
+        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+        .checkbox-group label { margin: 0; cursor: pointer; flex: 1; }
+        .screenshot-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .screenshot-item h4 { color: #ffd700; margin-bottom: 10px; }
+        .file-input-wrapper input[type="file"] {
+            width: 100%; padding: 10px;
+            background: rgba(0,212,255,0.1);
+            border: 2px dashed rgba(0,212,255,0.5);
+            border-radius: 8px; cursor: pointer;
+        }
+        .preview-img { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px; display: none; }
+        .btn {
+            padding: 15px 30px; border: none; border-radius: 8px;
+            font-size: 1rem; cursor: pointer; transition: all 0.3s;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: linear-gradient(135deg, #00d4ff, #0099cc); color: #000; font-weight: bold; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,212,255,0.4); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .buttons { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
+        .preview-section { background: #0d1117; border-radius: 10px; padding: 20px; margin-top: 20px; display: none; }
+        .preview-section h3 { color: #00d4ff; margin-bottom: 15px; }
+        .preview-content {
+            background: #161b22; padding: 20px; border-radius: 8px;
+            white-space: pre-wrap; font-family: 'Courier New', monospace;
+            font-size: 0.85rem; max-height: 400px; overflow-y: auto; color: #c9d1d9;
+        }
+        .info-box { background: rgba(0,212,255,0.1); border-left: 4px solid #00d4ff; padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 20px; }
+        .info-box p { color: #aaa; font-size: 0.9rem; }
+        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .success-message {
+            position: fixed; top: 20px; right: 20px;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000; padding: 15px 25px; border-radius: 10px;
+            font-weight: bold; display: none; z-index: 1000;
+        }
+        .nav-link { text-align: center; margin-bottom: 20px; }
+        .nav-link a { color: #00d4ff; text-decoration: none; }
+        .nav-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-link">
+            <a href="README.md">📖 Materi</a> | <a href="index.html">🌐 Web</a> | <a href="../index.html">🏠 Home</a>
+        </div>
+
+        <h1>📝 Form Laporan <span>Pertemuan 2</span></h1>
+        <p class="subtitle">Docker Images & Dockerfile</p>
+
+        <div class="info-box">
+            <p>💡 Isi form → Klik "Download LAPORAN.md" → Simpan screenshot di folder <code>ss/</code></p>
+        </div>
+
+        <!-- Identitas -->
+        <div class="card">
+            <h2>👤 Identitas Mahasiswa</h2>
+            <div class="row">
+                <div class="form-group">
+                    <label>Nama Lengkap *</label>
+                    <input type="text" id="nama" placeholder="Contoh: Budi Santoso">
+                </div>
+                <div class="form-group">
+                    <label>NIM *</label>
+                    <input type="text" id="nim" placeholder="Contoh: 12345678">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Kelas *</label>
+                    <input type="text" id="kelas" placeholder="Contoh: TI-3A">
+                </div>
+                <div class="form-group">
+                    <label>Tanggal Praktikum *</label>
+                    <input type="date" id="tanggal">
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist -->
+        <div class="card">
+            <h2>✅ Checklist Tugas</h2>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task1">
+                <label for="task1">Buat file <code>app.py</code></label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task2">
+                <label for="task2">Buat file <code>Dockerfile</code></label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task3">
+                <label for="task3">Build image berhasil</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task4">
+                <label for="task4">Run container berhasil</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task5">
+                <label for="task5">Screenshot semua hasil</label>
+            </div>
+        </div>
+
+        <!-- Kode -->
+        <div class="card">
+            <h2>💻 Kode Program</h2>
+            <div class="form-group">
+                <label>📄 app.py</label>
+                <textarea id="kode_app" class="code" placeholder="# Paste kode app.py di sini
+print('Hello from Docker!')
+print('Nama: ...')
+print('NIM: ...')"></textarea>
+            </div>
+            <div class="form-group">
+                <label>🐳 Dockerfile</label>
+                <textarea id="kode_dockerfile" class="code" placeholder="FROM python:3.11-slim
+WORKDIR /app
+COPY app.py .
+CMD [&quot;python&quot;, &quot;app.py&quot;]"></textarea>
+            </div>
+        </div>
+
+        <!-- Screenshots -->
+        <div class="card">
+            <h2>🖼️ Screenshot</h2>
+            
+            <div class="screenshot-item">
+                <h4>1️⃣ Struktur Folder Project</h4>
+                <input type="file" id="ss1" accept="image/*" onchange="previewImage(this, 'preview1')">
+                <img id="preview1" class="preview-img">
+                <div class="form-group" style="margin-top:10px">
+                    <label>Penjelasan:</label>
+                    <textarea id="penjelasan1" placeholder="Contoh: Folder berisi app.py dan Dockerfile"></textarea>
+                </div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>2️⃣ Docker Build</h4>
+                <input type="file" id="ss2" accept="image/*" onchange="previewImage(this, 'preview2')">
+                <img id="preview2" class="preview-img">
+                <div class="form-group" style="margin-top:10px">
+                    <label>Perintah yang dijalankan:</label>
+                    <input type="text" id="cmd_build" placeholder="docker build -t biodata-app:1.0 .">
+                </div>
+                <div class="form-group">
+                    <label>Penjelasan:</label>
+                    <textarea id="penjelasan2" placeholder="Contoh: Build berhasil, image terbuat"></textarea>
+                </div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>3️⃣ Docker Images</h4>
+                <input type="file" id="ss3" accept="image/*" onchange="previewImage(this, 'preview3')">
+                <img id="preview3" class="preview-img">
+                <div class="form-group" style="margin-top:10px">
+                    <label>Penjelasan:</label>
+                    <textarea id="penjelasan3" placeholder="Contoh: Image biodata-app:1.0 terlihat di daftar"></textarea>
+                </div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>4️⃣ Docker Run (Output)</h4>
+                <input type="file" id="ss4" accept="image/*" onchange="previewImage(this, 'preview4')">
+                <img id="preview4" class="preview-img">
+                <div class="form-group" style="margin-top:10px">
+                    <label>Perintah yang dijalankan:</label>
+                    <input type="text" id="cmd_run" placeholder="docker run biodata-app:1.0">
+                </div>
+                <div class="form-group">
+                    <label>Output yang muncul:</label>
+                    <textarea id="output_run" placeholder="Hello from Docker!&#10;Nama: Budi&#10;NIM: 12345678"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kendala -->
+        <div class="card">
+            <h2>⚠️ Kendala & Solusi</h2>
+            <div class="form-group">
+                <label>Kendala:</label>
+                <textarea id="kendala" placeholder="Tidak ada kendala"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Solusi:</label>
+                <textarea id="solusi" placeholder="-"></textarea>
+            </div>
+        </div>
+
+        <!-- Kesimpulan -->
+        <div class="card">
+            <h2>💡 Kesimpulan</h2>
+            <textarea id="kesimpulan" style="min-height:150px" placeholder="- Dockerfile adalah blueprint untuk membuat image
+- FROM menentukan base image
+- COPY untuk menyalin file ke image
+- CMD untuk menjalankan aplikasi"></textarea>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-secondary" onclick="previewMarkdown()">👁️ Preview</button>
+            <button class="btn btn-primary" onclick="downloadMarkdown()">📥 Download LAPORAN.md</button>
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <h3>📄 Preview LAPORAN.md</h3>
+            <div class="preview-content" id="previewContent"></div>
+        </div>
+    </div>
+
+    <div class="success-message" id="successMsg">✅ Berhasil!</div>
+
+    <script>
+        document.getElementById('tanggal').valueAsDate = new Date();
+
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function generateMarkdown() {
+            const v = id => document.getElementById(id).value || '';
+            const c = id => document.getElementById(id).checked ? '✅ Sudah' : '⬜ Belum';
+            const tgl = v('tanggal') ? new Date(v('tanggal')).toLocaleDateString('id-ID') : '[DD/MM/YYYY]';
+
+            return `# 📝 Laporan Praktikum - Pertemuan 2
+
+## 📦 Docker Images & Dockerfile
+
+---
+
+## 👤 Identitas Mahasiswa
+
+| Field | Isi |
+|-------|-----|
+| **Nama** | ${v('nama') || '[Nama]'} |
+| **NIM** | ${v('nim') || '[NIM]'} |
+| **Kelas** | ${v('kelas') || '[Kelas]'} |
+| **Tanggal Praktikum** | ${tgl} |
+
+---
+
+## 📋 Hasil Praktikum
+
+### ✅ Checklist Tugas
+
+| No | Tugas | Status |
+|----|-------|--------|
+| 1 | Buat file \`app.py\` | ${c('task1')} |
+| 2 | Buat file \`Dockerfile\` | ${c('task2')} |
+| 3 | Build image berhasil | ${c('task3')} |
+| 4 | Run container berhasil | ${c('task4')} |
+| 5 | Screenshot semua hasil | ${c('task5')} |
+
+---
+
+## 💻 Kode Program
+
+### 📄 app.py
+\`\`\`python
+${v('kode_app') || '# Kode app.py'}
+\`\`\`
+
+### 🐳 Dockerfile
+\`\`\`dockerfile
+${v('kode_dockerfile') || '# Dockerfile'}
+\`\`\`
+
+---
+
+## 🖼️ Screenshot Hasil
+
+> **📁 Screenshot disimpan di folder:** \`pertemuan-02/ss/\`
+
+### 1️⃣ Struktur Folder Project
+![Struktur Folder](ss/01-struktur-folder.png)
+
+**Penjelasan:**
+\`\`\`
+${v('penjelasan1') || '[Penjelasan]'}
+\`\`\`
+
+---
+
+### 2️⃣ Docker Build
+![Docker Build](ss/02-docker-build.png)
+
+**Perintah:**
+\`\`\`bash
+${v('cmd_build') || 'docker build -t nama-image:tag .'}
+\`\`\`
+
+**Penjelasan:**
+\`\`\`
+${v('penjelasan2') || '[Penjelasan]'}
+\`\`\`
+
+---
+
+### 3️⃣ Docker Images
+![Docker Images](ss/03-docker-images.png)
+
+**Penjelasan:**
+\`\`\`
+${v('penjelasan3') || '[Penjelasan]'}
+\`\`\`
+
+---
+
+### 4️⃣ Docker Run (Output)
+![Docker Run](ss/04-docker-run.png)
+
+**Perintah:**
+\`\`\`bash
+${v('cmd_run') || 'docker run nama-image:tag'}
+\`\`\`
+
+**Output:**
+\`\`\`
+${v('output_run') || '[Output]'}
+\`\`\`
+
+---
+
+## 📝 Catatan & Kendala
+
+### Kendala:
+\`\`\`
+${v('kendala') || 'Tidak ada kendala'}
+\`\`\`
+
+### Solusi:
+\`\`\`
+${v('solusi') || '-'}
+\`\`\`
+
+---
+
+## 💡 Kesimpulan
+
+\`\`\`
+${v('kesimpulan') || '[Kesimpulan]'}
+\`\`\`
+
+---
+
+## 📊 Penilaian
+
+> *Diisi oleh Dosen/Asisten*
+
+| Kriteria | Nilai |
+|----------|-------|
+| Kode app.py benar | /20 |
+| Dockerfile benar | /30 |
+| Build berhasil | /20 |
+| Screenshot lengkap | /20 |
+| Kesimpulan | /10 |
+| **Total** | **/100** |
+
+---
+
+<div align="center">
+
+📅 **Pertemuan 2** | [🏠 Kembali ke README](README.md)
+
+</div>
+`;
+        }
+
+        function previewMarkdown() {
+            document.getElementById('previewContent').textContent = generateMarkdown();
+            document.getElementById('previewSection').style.display = 'block';
+            document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadMarkdown() {
+            const blob = new Blob([generateMarkdown()], { type: 'text/markdown' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'LAPORAN.md';
+            a.click();
+            showSuccess('LAPORAN.md berhasil didownload!');
+        }
+
+        function showSuccess(msg) {
+            const el = document.getElementById('successMsg');
+            el.textContent = '✅ ' + msg;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
+        }
+
+        // Auto-save
+        const fields = ['nama','nim','kelas','tanggal','task1','task2','task3','task4','task5','kode_app','kode_dockerfile','penjelasan1','penjelasan2','penjelasan3','cmd_build','cmd_run','output_run','kendala','solusi','kesimpulan'];
+        
+        function save() {
+            const data = {};
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                data[f] = el.type === 'checkbox' ? el.checked : el.value;
+            });
+            localStorage.setItem('laporan_p2', JSON.stringify(data));
+        }
+
+        function load() {
+            const saved = localStorage.getItem('laporan_p2');
+            if (saved) {
+                const data = JSON.parse(saved);
+                fields.forEach(f => {
+                    const el = document.getElementById(f);
+                    if (el) {
+                        if (el.type === 'checkbox') el.checked = data[f] || false;
+                        else el.value = data[f] || '';
+                    }
+                });
+            }
+        }
+
+        document.querySelectorAll('input, textarea').forEach(el => {
+            el.addEventListener('change', save);
+            el.addEventListener('input', save);
+        });
+
+        load();
+    </script>
+</body>
+</html>

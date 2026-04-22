@@ -1,233 +1,244 @@
-# Pertemuan 6: Kubernetes Architecture & Concepts
+# ⚙️ Pertemuan 6: Pengenalan Kubernetes
+
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Minikube](https://img.shields.io/badge/Minikube-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Level](https://img.shields.io/badge/Level-Intermediate-yellow?style=for-the-badge)
+
+---
 
 ## 🎯 Tujuan Pembelajaran
 
-1. Memahami Kubernetes architecture
-2. Setup Kubernetes cluster (Minikube)
-3. Kubernetes components (Master & Worker nodes)
-4. kubectl CLI basics
-5. Kubernetes objects (Pods, Deployments, Services)
+| No | Tujuan | Status |
+|----|--------|--------|
+| 1 | Memahami apa itu Kubernetes | ⬜ |
+| 2 | Memahami komponen dasar K8s | ⬜ |
+| 3 | Menginstall Minikube | ⬜ |
+| 4 | Menjalankan Pod pertama | ⬜ |
 
-## 📚 Teori Singkat
+---
 
-### Kubernetes Architecture
+## 📚 Materi
+
+### 🤔 Apa itu Kubernetes?
 
 ```
-┌─────────────────────────────────────┐
-│         Master Node                 │
-│  ┌──────────────────────────────┐  │
-│  │  API Server                   │  │
-│  │  Scheduler                    │  │
-│  │  Controller Manager           │  │
-│  │  etcd (Key-Value Store)       │  │
-│  └──────────────────────────────┘  │
-└─────────────────┬───────────────────┘
-                  │
-    ┌─────────────┼─────────────┐
-    │             │             │
-┌───▼────┐   ┌───▼────┐   ┌───▼────┐
-│ Worker │   │ Worker │   │ Worker │
-│ Node 1 │   │ Node 2 │   │ Node 3 │
-│┌──────┐│   │┌──────┐│   │┌──────┐│
-││Kubelet││   ││Kubelet││   ││Kubelet││
-││Kube  ││   ││Kube  ││   ││Kube  ││
-││Proxy ││   ││Proxy ││   ││Proxy ││
-│└──────┘│   │└──────┘│   │└──────┘│
-└────────┘   └────────┘   └────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   🐳 Docker           vs        ⚙️ Kubernetes                   │
+│   ────────                      ────────────                    │
+│                                                                 │
+│   "Membuat &                    "Mengelola BANYAK               │
+│    menjalankan                   container secara               │
+│    container"                    OTOMATIS"                      │
+│                                                                 │
+│   Seperti:                      Seperti:                        │
+│   Membuat kapal 🚢              Mengatur pelabuhan ⚓            │
+│                                 dengan banyak kapal             │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Core Components
+> 💡 **Kubernetes (K8s)** = Platform untuk **orchestration** container dalam skala besar
 
-**Control Plane:**
-- API Server: Central management
-- Scheduler: Pod placement
-- Controller Manager: Cluster state
-- etcd: Configuration data
+---
 
-**Worker Nodes:**
-- Kubelet: Node agent
-- Kube-proxy: Network proxy
-- Container Runtime: Docker/containerd
+### 🧩 Komponen Utama
 
-### Key Concepts
+```
+┌───────────────────────────────────────────────────────────────────┐
+│                    ⚙️ KUBERNETES CLUSTER                          │
+│                                                                   │
+│  ┌─────────────────────────────────────────────────────────────┐  │
+│  │                    Control Plane                            │  │
+│  │              (Otak yang mengatur semua)                     │  │
+│  └─────────────────────────────────────────────────────────────┘  │
+│                             │                                     │
+│              ┌──────────────┼──────────────┐                      │
+│              │              │              │                      │
+│              ▼              ▼              ▼                      │
+│  ┌───────────────┐ ┌───────────────┐ ┌───────────────┐           │
+│  │    NODE 1     │ │    NODE 2     │ │    NODE 3     │           │
+│  │  ┌─────────┐  │ │  ┌─────────┐  │ │  ┌─────────┐  │           │
+│  │  │  Pod 1  │  │ │  │  Pod 3  │  │ │  │  Pod 5  │  │           │
+│  │  │ [nginx] │  │ │  │ [mysql] │  │ │  │ [redis] │  │           │
+│  │  └─────────┘  │ │  └─────────┘  │ │  └─────────┘  │           │
+│  │  ┌─────────┐  │ │  ┌─────────┐  │ │               │           │
+│  │  │  Pod 2  │  │ │  │  Pod 4  │  │ │               │           │
+│  │  │ [flask] │  │ │  │ [flask] │  │ │               │           │
+│  │  └─────────┘  │ │  └─────────┘  │ │               │           │
+│  └───────────────┘ └───────────────┘ └───────────────┘           │
+└───────────────────────────────────────────────────────────────────┘
+```
 
-- **Pod**: Smallest deployable unit
-- **Deployment**: Manages ReplicaSets
-- **Service**: Network endpoint
-- **Namespace**: Virtual clusters
-- **ConfigMap**: Configuration data
-- **Secret**: Sensitive data
+| Komponen | Penjelasan | Analogi |
+|----------|------------|---------|
+| **Pod** | Unit terkecil, berisi 1+ container | 📦 Kotak berisi aplikasi |
+| **Node** | Mesin/server yang menjalankan Pod | 🖥️ Komputer/server |
+| **Cluster** | Kumpulan Nodes | 🏢 Data center |
+| **kubectl** | CLI untuk berinteraksi dengan K8s | 🎮 Remote control |
 
-## 🛠️ Setup Minikube
+---
+
+### 🔄 Docker Compose vs Kubernetes
+
+| Aspek | Docker Compose | Kubernetes |
+|-------|----------------|------------|
+| Tujuan | Development | Production |
+| Skala | Single host | Multi-host cluster |
+| Auto-scaling | ❌ | ✅ |
+| Self-healing | ❌ | ✅ |
+| Load balancing | Basic | Advanced |
+| Kompleksitas | Simple | Complex |
+
+---
+
+## 🧪 Praktikum
+
+### Step 1: Install Minikube
+
+<details>
+<summary>🐧 <b>Linux</b></summary>
 
 ```bash
-# Install Minikube
+# Download
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+
+# Install
 sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
-# Start cluster
-minikube start --cpus=2 --memory=4096
-
-# Verify
-kubectl cluster-info
-kubectl get nodes
-
-# Minikube dashboard
-minikube dashboard
+# Verifikasi
+minikube version
 ```
+</details>
 
-## 📝 Praktikum
-
-### kubectl Basics
+<details>
+<summary>🍎 <b>macOS</b></summary>
 
 ```bash
-# Cluster info
-kubectl cluster-info
-kubectl get nodes
-kubectl get namespaces
-
-# Create namespace
-kubectl create namespace dev
-
-# Get resources
-kubectl get pods
-kubectl get deployments
-kubectl get services
-kubectl get all
-
-# Describe resource
-kubectl describe pod <pod-name>
-kubectl describe node <node-name>
-
-# Logs
-kubectl logs <pod-name>
-kubectl logs -f <pod-name>  # Follow
-
-# Execute command
-kubectl exec -it <pod-name> -- /bin/bash
+brew install minikube
 ```
+</details>
 
-### First Pod
-
-```yaml
-# pod.yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-pod
-  labels:
-    app: nginx
-spec:
-  containers:
-  - name: nginx
-    image: nginx:latest
-    ports:
-    - containerPort: 80
-```
-
+### Step 2: Start Cluster
 ```bash
-# Apply configuration
-kubectl apply -f pod.yaml
+# Start Minikube
+minikube start
 
-# Check status
+# Cek status
+minikube status
+
+# Hasil yang diharapkan:
+# minikube
+# type: Control Plane
+# host: Running
+# kubelet: Running
+# apiserver: Running
+```
+
+### Step 3: Perintah kubectl Dasar
+```bash
+# 📋 Lihat semua nodes
+kubectl get nodes
+
+# 🚀 Jalankan Pod pertama
+kubectl run nginx-pod --image=nginx
+
+# 👀 Lihat pods
 kubectl get pods
+
+# 🔍 Detail pod
 kubectl describe pod nginx-pod
 
-# Port forward
-kubectl port-forward nginx-pod 8080:80
+# 📜 Lihat logs
+kubectl logs nginx-pod
 
-# Delete pod
+# 🗑️ Hapus pod
 kubectl delete pod nginx-pod
 ```
 
-### First Deployment
-
-```yaml
-# deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.21
-        ports:
-        - containerPort: 80
-```
-
+### Step 4: Kubernetes Dashboard
 ```bash
-# Create deployment
-kubectl apply -f deployment.yaml
+# Buka dashboard (GUI)
+minikube dashboard
 
-# Check deployment
-kubectl get deployments
-kubectl get pods
-
-# Scale deployment
-kubectl scale deployment nginx-deployment --replicas=5
-
-# Update image
-kubectl set image deployment/nginx-deployment nginx=nginx:1.22
+# Browser akan terbuka otomatis!
 ```
-
-### First Service
-
-```yaml
-# service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-service
-spec:
-  type: NodePort
-  selector:
-    app: nginx
-  ports:
-  - port: 80
-    targetPort: 80
-    nodePort: 30080
-```
-
-```bash
-# Create service
-kubectl apply -f service.yaml
-
-# Access service
-minikube service nginx-service
-
-# Get service URL
-minikube service nginx-service --url
-```
-
-## 💪 Tugas Praktikum
-
-### Tugas 1: Minikube Setup (20%)
-Install, start cluster, screenshot dashboard
-
-### Tugas 2: kubectl Mastery (25%)
-Practice all basic commands, create cheatsheet
-
-### Tugas 3: Deploy Application (30%)
-Deploy web app dengan 3 replicas + service
-
-### Tugas 4: Troubleshooting (25%)
-Debug failing pods, analyze logs
-
-## 📚 Referensi
-
-1. [Kubernetes Documentation](https://kubernetes.io/docs/)
-2. [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-3. [Minikube Documentation](https://minikube.sigs.k8s.io/docs/)
 
 ---
-**Welcome to Kubernetes! ☸️**
+
+## ⌨️ Cheatsheet kubectl
+
+| Perintah | Fungsi |
+|----------|--------|
+| `kubectl get pods` | Lihat semua pods |
+| `kubectl get pods -o wide` | Lihat pods dengan detail |
+| `kubectl get nodes` | Lihat nodes |
+| `kubectl get all` | Lihat semua resources |
+| `kubectl describe pod [nama]` | Detail spesifik pod |
+| `kubectl logs [nama]` | Lihat logs |
+| `kubectl exec -it [nama] -- bash` | Masuk ke pod |
+| `kubectl delete pod [nama]` | Hapus pod |
+
+---
+
+## ✏️ Tugas Praktikum
+
+### 📝 Tugas: Eksplorasi Kubernetes
+
+| Kriteria | Poin |
+|----------|------|
+| Minikube berhasil diinstall & start | 30 |
+| Jalankan 3 pod berbeda (nginx, httpd, redis) | 30 |
+| Screenshot `kubectl get pods` | 20 |
+| Screenshot Kubernetes Dashboard | 20 |
+| **Total** | **100** |
+
+**Pods yang harus dijalankan:**
+```bash
+kubectl run nginx-pod --image=nginx
+kubectl run httpd-pod --image=httpd
+kubectl run redis-pod --image=redis
+```
+
+---
+
+## 📤 Pengumpulan Tugas
+
+### 📁 Struktur Folder
+```
+pertemuan-06/
+├── 📄 README.md          # Materi (file ini)
+├── 📄 LAPORAN.md         # ⬅️ ISI LAPORAN DI SINI!
+└── 📁 ss/                # ⬅️ SIMPAN SCREENSHOT DI SINI!
+    ├── 01-minikube-version.png
+    ├── 02-minikube-start.png
+    ├── 03-minikube-status.png
+    ├── 04-get-nodes.png
+    ├── 05-run-pods.png
+    ├── 06-get-pods.png
+    ├── 07-get-pods-wide.png
+    └── 08-dashboard.png
+```
+
+### 📝 Cara Mengerjakan:
+1. **Screenshot** → Simpan di folder `ss/`
+2. **Laporan** → Edit file `LAPORAN.md`
+3. Isi output dari setiap perintah
+
+> 📋 **Template Laporan:** [Klik di sini untuk mengisi LAPORAN.md](LAPORAN.md)
+
+---
+
+## 📖 Referensi
+
+- 🔗 [Kubernetes Documentation](https://kubernetes.io/docs/)
+- 🔗 [Minikube Documentation](https://minikube.sigs.k8s.io/docs/)
+- 🔗 [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
+
+---
+
+<div align="center">
+
+[⬅️ Pertemuan 5](../pertemuan-05/README.md) | **📅 Pertemuan 6 dari 8** | [➡️ Pertemuan 7](../pertemuan-07/README.md)
+
+</div>

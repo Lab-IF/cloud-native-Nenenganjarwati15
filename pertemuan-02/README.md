@@ -1,155 +1,185 @@
-# Pertemuan 2: Docker Fundamentals - Images & Containers
+# 📦 Pertemuan 2: Docker Images & Dockerfile
+
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Level](https://img.shields.io/badge/Level-Beginner-green?style=for-the-badge)
+
+---
 
 ## 🎯 Tujuan Pembelajaran
 
-1. Memahami perbedaan Docker images vs containers
-2. Menguasai Docker CLI commands
-3. Building custom Docker images
-4. Managing containers lifecycle
-5. Docker networking basics
+| No | Tujuan | Status |
+|----|--------|--------|
+| 1 | Memahami perbedaan Image dan Container | ⬜ |
+| 2 | Membuat Dockerfile sederhana | ⬜ |
+| 3 | Build custom Docker image | ⬜ |
 
-## 📚 Teori Singkat
+---
 
-### Docker Architecture
+## 📚 Materi
 
-```
-┌──────────────────────────────────┐
-│       Docker Client (CLI)        │
-└────────────┬─────────────────────┘
-             │
-┌────────────▼─────────────────────┐
-│       Docker Daemon              │
-│  ┌──────────────────────────┐   │
-│  │   Container Runtime      │   │
-│  └──────────────────────────┘   │
-└──────────────────────────────────┘
-             │
-┌────────────▼─────────────────────┐
-│       Host OS Kernel             │
-└──────────────────────────────────┘
-```
-
-### Images vs Containers
-
-**Image:**
-- Read-only template
-- Contains application code + dependencies
-- Layered filesystem
-- Stored in registry
-
-**Container:**
-- Running instance of image
-- Writable layer on top
-- Isolated process
-- Ephemeral
-
-### Docker Lifecycle
+### 🖼️ Docker Image vs Container
 
 ```
-docker pull  → docker create → docker start → docker stop → docker rm
-                                    ↓
-                              docker run (create + start)
+┌──────────────────────────────────────────────────────────────┐
+│                                                              │
+│   📄 IMAGE (Template)          📦 CONTAINER (Instance)       │
+│   ─────────────────           ──────────────────────────     │
+│   • Read-only                 • Bisa dimodifikasi            │
+│   • Blueprint/resep           • Aplikasi berjalan            │
+│   • Bisa dibagikan            • Dibuat dari image            │
+│                                                              │
+│   ┌─────────────┐             ┌─────────────┐                │
+│   │   IMAGE     │ ──────────► │ CONTAINER 1 │                │
+│   │  nginx:1.0  │    docker   ├─────────────┤                │
+│   └─────────────┘     run     │ CONTAINER 2 │                │
+│                               ├─────────────┤                │
+│         1 Image       ──►     │ CONTAINER 3 │                │
+│                               └─────────────┘                │
+│                                 N Containers                 │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-## 📝 Praktikum
+> 💡 **Analogi:** Image = Resep Kue 📝 | Container = Kue yang sudah jadi 🎂
 
-### Basic Commands
+---
 
-```bash
-# Pull image
-docker pull ubuntu:22.04
-docker pull nginx:latest
+### 📝 Dockerfile
 
-# List images
-docker images
+Dockerfile adalah file teks berisi **instruksi langkah-langkah** untuk membuat Docker Image.
 
-# Run container
-docker run ubuntu echo "Hello Docker"
-docker run -it ubuntu bash  # Interactive
-docker run -d nginx        # Detached
+#### Instruksi Dasar:
 
-# List containers
-docker ps       # Running only
-docker ps -a    # All
+| Instruksi | Fungsi | Contoh |
+|-----------|--------|--------|
+| `FROM` | Base image | `FROM python:3.11` |
+| `WORKDIR` | Set working directory | `WORKDIR /app` |
+| `COPY` | Copy file dari host | `COPY . /app` |
+| `RUN` | Jalankan command saat build | `RUN pip install flask` |
+| `CMD` | Command default saat run | `CMD ["python", "app.py"]` |
+| `EXPOSE` | Dokumentasi port | `EXPOSE 5000` |
 
-# Container management
-docker stop <container-id>
-docker start <container-id>
-docker restart <container-id>
-docker rm <container-id>
-
-# Image management
-docker rmi <image-id>
-docker image prune  # Remove unused
-```
-
-### Create First Dockerfile
+#### 📄 Contoh Dockerfile:
 
 ```dockerfile
-# Dockerfile
+# 🐍 Base image Python
 FROM python:3.11-slim
 
+# 📁 Set working directory
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# 📋 Copy file aplikasi
+COPY app.py .
 
-COPY . .
-
-EXPOSE 5000
-
+# 🚀 Command untuk menjalankan aplikasi
 CMD ["python", "app.py"]
 ```
 
-```bash
-# Build image
-docker build -t my-python-app:1.0 .
+---
 
-# Run container
-docker run -d -p 5000:5000 --name myapp my-python-app:1.0
-
-# View logs
-docker logs myapp
-docker logs -f myapp  # Follow
-
-# Execute command in running container
-docker exec -it myapp bash
-```
-
-### Port Mapping & Volumes
+### ⌨️ Perintah Build & Run
 
 ```bash
-# Port mapping
-docker run -d -p 8080:80 nginx
-docker run -d -p 3000:3000 -p 8080:8080 myapp
+# 🔨 Build image dari Dockerfile
+docker build -t nama-image:tag .
 
-# Volume mounting
-docker run -v /host/path:/container/path nginx
-docker run -v mydata:/app/data myapp
+# Penjelasan:
+#   -t          = tag/nama untuk image
+#   nama:tag    = format nama image
+#   .           = lokasi Dockerfile (current dir)
 
-# Named volumes
-docker volume create mydata
-docker volume ls
-docker volume inspect mydata
+# 🚀 Jalankan container dari image
+docker run nama-image:tag
+
+# 🗑️ Hapus image
+docker rmi nama-image:tag
 ```
-
-## 💪 Tugas Praktikum
-
-### Tugas 1: Docker Commands Mastery (20%)
-Practice all basic commands, create cheatsheet
-
-### Tugas 2: Build Multi-Stage Image (30%)
-Optimize image size dengan multi-stage build
-
-### Tugas 3: Persistent Data (25%)
-Implement volume for database container
-
-### Tugas 4: Container Networking (25%)
-Connect multiple containers
-
-## 📚 Referensi
-
-[Docker Get Started](https://docs.docker.com/get-started/)
 
 ---
-**Master Docker! 🐳**
+
+## 🧪 Praktikum
+
+### Step 1: Buat Folder Project
+```bash
+mkdir docker-python
+cd docker-python
+```
+
+### Step 2: Buat File `app.py`
+```python
+# app.py
+print("=" * 40)
+print("🐳 Hello from Docker!")
+print("Nama  : [Ganti dengan nama Anda]")
+print("NIM   : [Ganti dengan NIM Anda]")
+print("=" * 40)
+```
+
+### Step 3: Buat File `Dockerfile`
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY app.py .
+CMD ["python", "app.py"]
+```
+
+### Step 4: Build & Run
+```bash
+# Build
+docker build -t biodata-app:1.0 .
+
+# Run
+docker run biodata-app:1.0
+```
+
+---
+
+## ✏️ Tugas Praktikum
+
+### 📝 Tugas: Aplikasi Biodata
+
+| Kriteria | Poin |
+|----------|------|
+| Aplikasi menampilkan Nama, NIM, Kelas | 40 |
+| Dockerfile benar | 30 |
+| Build berhasil | 20 |
+| Screenshot lengkap | 10 |
+| **Total** | **100** |
+
+---
+
+## 📤 Pengumpulan Tugas
+
+### 📁 Struktur Folder
+```
+pertemuan-02/
+├── 📄 README.md          # Materi (file ini)
+├── 📄 LAPORAN.md         # ⬅️ ISI LAPORAN DI SINI!
+└── 📁 ss/                # ⬅️ SIMPAN SCREENSHOT DI SINI!
+    ├── 01-struktur-folder.png
+    ├── 02-docker-build.png
+    ├── 03-docker-images.png
+    └── 04-docker-run.png
+```
+
+### 📝 Cara Mengerjakan:
+1. **Screenshot** → Simpan di folder `ss/`
+2. **Laporan** → Edit file `LAPORAN.md`
+3. **Paste kode** `app.py` dan `Dockerfile` di laporan
+
+> 📋 **Template Laporan:** [Klik di sini untuk mengisi LAPORAN.md](LAPORAN.md)
+
+---
+
+## 📖 Referensi
+
+- 🔗 [Dockerfile Reference](https://docs.docker.com/engine/reference/builder/)
+- 🔗 [Best Practices Dockerfile](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
+
+---
+
+<div align="center">
+
+[⬅️ Pertemuan 1](../pertemuan-01/README.md) | **📅 Pertemuan 2 dari 8** | [➡️ Pertemuan 3](../pertemuan-03/README.md)
+
+</div>

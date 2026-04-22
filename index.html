@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Native Practicum</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: #00d4ff;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+        }
+
+        .hero-badges {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .badge i {
+            color: #00d4ff;
+        }
+
+        /* Timeline Section */
+        .timeline-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h3 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .section-title p {
+            color: #888;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--card-color), transparent);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--card-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-number {
+            width: 50px;
+            height: 50px;
+            background: var(--card-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .card-title h4 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .card-title span {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .card-content p {
+            color: #aaa;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .card-topics {
+            margin-bottom: 20px;
+        }
+
+        .card-topics h5 {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .topic-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .difficulty {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .difficulty-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .difficulty-dot.active {
+            background: var(--card-color);
+        }
+
+        .btn-view {
+            background: var(--card-color);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-view:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-laporan {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-laporan:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .card-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Card Colors */
+        .card:nth-child(1) { --card-color: #00d4ff; }
+        .card:nth-child(2) { --card-color: #7c3aed; }
+        .card:nth-child(3) { --card-color: #10b981; }
+        .card:nth-child(4) { --card-color: #f59e0b; }
+        .card:nth-child(5) { --card-color: #ef4444; }
+        .card:nth-child(6) { --card-color: #3b82f6; }
+        .card:nth-child(7) { --card-color: #ec4899; }
+        .card:nth-child(8) { --card-color: #8b5cf6; }
+
+        /* Learning Path */
+        .learning-path {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .path-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .path-item {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .path-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5rem;
+        }
+
+        .path-item h5 {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .path-item p {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .path-arrow {
+            color: #444;
+            font-size: 1.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .path-arrow {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fab fa-docker"></i>
+                <div class="logo-text">
+                    <h1>Cloud Native Practicum</h1>
+                    <p>Semester 5 - 2025/2026</p>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="#materi">Materi</a>
+                <a href="#learning-path">Learning Path</a>
+                <a href="koordinator.html" style="color:#ffd700;">👨‍🏫 Koordinator</a>
+                <a href="https://github.com" target="_blank">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h2>🚀 Belajar Docker & Kubernetes</h2>
+        <p>
+            Praktikum Cloud Native dirancang untuk memperkenalkan konsep containerization 
+            dan orchestration kepada mahasiswa. Mulai dari dasar Docker hingga deployment 
+            aplikasi di Kubernetes.
+        </p>
+        <div class="hero-badges">
+            <div class="badge">
+                <i class="fas fa-clock"></i>
+                <span>8 Pertemuan</span>
+            </div>
+            <div class="badge">
+                <i class="fas fa-laptop-code"></i>
+                <span>Hands-on Practice</span>
+            </div>
+            <div class="badge">
+                <i class="fas fa-project-diagram"></i>
+                <span>Project-based</span>
+            </div>
+            <div class="badge">
+                <i class="fas fa-certificate"></i>
+                <span>Industry Skills</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learning Path -->
+    <section class="learning-path" id="learning-path">
+        <div class="section-title">
+            <h3>📈 Learning Path</h3>
+            <p>Alur pembelajaran dari dasar hingga deployment</p>
+        </div>
+        <div class="path-container">
+            <div class="path-item">
+                <div class="path-icon"><i class="fab fa-docker"></i></div>
+                <h5>Docker Basics</h5>
+                <p>Minggu 1-2</p>
+            </div>
+            <div class="path-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="path-item">
+                <div class="path-icon"><i class="fas fa-database"></i></div>
+                <h5>Volume & Data</h5>
+                <p>Minggu 3</p>
+            </div>
+            <div class="path-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="path-item">
+                <div class="path-icon"><i class="fas fa-layer-group"></i></div>
+                <h5>Compose</h5>
+                <p>Minggu 4</p>
+            </div>
+            <div class="path-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="path-item">
+                <div class="path-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <h5>Registry</h5>
+                <p>Minggu 5</p>
+            </div>
+            <div class="path-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="path-item">
+                <div class="path-icon"><i class="fas fa-dharmachakra"></i></div>
+                <h5>Kubernetes</h5>
+                <p>Minggu 6-7</p>
+            </div>
+            <div class="path-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="path-item">
+                <div class="path-icon"><i class="fas fa-trophy"></i></div>
+                <h5>UTS Project</h5>
+                <p>Minggu 8</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cards Section -->
+    <section class="timeline-section" id="materi">
+        <div class="section-title">
+            <h3>📚 Materi Pertemuan</h3>
+            <p>Klik pada setiap kartu untuk melihat detail materi</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Pertemuan 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-number">01</div>
+                    <div class="card-title">
+                        <h4>Pengenalan Docker</h4>
+                        <span>Minggu 1</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>
+                        Memahami konsep dasar Docker, perbedaan VM vs Container, 
+                        instalasi Docker, dan menjalankan container pertama. 
+                        Fondasi penting sebelum melangkah lebih jauh.
+                    </p>
+                </div>
+                <div class="card-topics">
+                    <h5>Topik Pembelajaran</h5>
+                    <div class="topics-list">
+                        <span class="topic-tag">Apa itu Docker</span>
+                        <span class="topic-tag">VM vs Container</span>
+                        <span class="topic-tag">Instalasi</span>
+                        <span class="topic-tag">docker run</span>
+                        <span class="topic-tag">docker ps</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="difficulty">
+                        <span>Kesulitan:</span>
+                        <div class="difficulty-dots">
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot"></span>
+                            <span class="difficulty-dot"></span>
+                        </div>
+                    </div>
+                    <div class="card-buttons">
+                        <a href="pertemuan-01/laporan.html" class="btn-laporan"><i class="fas fa-edit"></i> Laporan</a>
+                        <a href="pertemuan-01/README.md" class="btn-view"><i class="fas fa-book-open"></i> Materi</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pertemuan 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-number">02</div>
+                    <div class="card-title">
+                        <h4>Docker Images & Dockerfile</h4>
+                        <span>Minggu 2</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>
+                        Belajar membuat Docker Image sendiri menggunakan Dockerfile. 
+                        Memahami instruksi dasar seperti FROM, COPY, RUN, dan CMD. 
+                        Praktik membuat aplikasi Flask dalam container.
+                    </p>
+                </div>
+                <div class="card-topics">
+                    <h5>Topik Pembelajaran</h5>
+                    <div class="topics-list">
+                        <span class="topic-tag">Docker Image</span>
+                        <span class="topic-tag">Dockerfile</span>
+                        <span class="topic-tag">docker build</span>
+                        <span class="topic-tag">Flask App</span>
+                        <span class="topic-tag">Image Layers</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="difficulty">
+                        <span>Kesulitan:</span>
+                        <div class="difficulty-dots">
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot"></span>
+                        </div>
+                    </div>
+                    <div class="card-buttons">
+                        <a href="pertemuan-02/laporan.html" class="btn-laporan"><i class="fas fa-edit"></i> Laporan</a>
+                        <a href="pertemuan-02/README.md" class="btn-view"><i class="fas fa-book-open"></i> Materi</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pertemuan 3 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-number">03</div>
+                    <div class="card-title">
+                        <h4>Docker Volume & Port</h4>
+                        <span>Minggu 3</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>
+                        Memahami cara menyimpan data secara persisten menggunakan Volume. 
+                        Belajar port mapping untuk mengakses aplikasi dari luar container. 
+                        Praktik dengan MySQL database.
+                    </p>
+                </div>
+                <div class="card-topics">
+                    <h5>Topik Pembelajaran</h5>
+                    <div class="topics-list">
+                        <span class="topic-tag">Bind Mount</span>
+                        <span class="topic-tag">Named Volume</span>
+                        <span class="topic-tag">Port Mapping</span>
+                        <span class="topic-tag">MySQL Container</span>
+                        <span class="topic-tag">Data Persistence</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="difficulty">
+                        <span>Kesulitan:</span>
+                        <div class="difficulty-dots">
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot"></span>
+                        </div>
+                    </div>
+                    <div class="card-buttons">
+                        <a href="pertemuan-03/laporan.html" class="btn-laporan"><i class="fas fa-edit"></i> Laporan</a>
+                        <a href="pertemuan-03/README.md" class="btn-view"><i class="fas fa-book-open"></i> Materi</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pertemuan 4 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-number">04</div>
+                    <div class="card-title">
+                        <h4>Docker Compose</h4>
+                        <span>Minggu 4</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>
+                        Mengelola multiple container dengan Docker Compose. 
+                        Menulis file docker-compose.yml dan menjalankan aplikasi 
+                        full-stack (Flask + MySQL) dengan satu perintah.
+                    </p>
+                </div>
+                <div class="card-topics">
+                    <h5>Topik Pembelajaran</h5>
+                    <div class="topics-list">
+                        <span class="topic-tag">docker-compose.yml</span>
+                        <span class="topic-tag">Services</span>
+                        <span class="topic-tag">Networks</span>
+                        <span class="topic-tag">depends_on</span>
+                        <span class="topic-tag">WordPress Setup</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="difficulty">
+                        <span>Kesulitan:</span>
+                        <div class="difficulty-dots">
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot"></span>
+                        </div>
+                    </div>
+                    <div class="card-buttons">
+                        <a href="pertemuan-04/laporan.html" class="btn-laporan"><i class="fas fa-edit"></i> Laporan</a>
+                        <a href="pertemuan-04/README.md" class="btn-view"><i class="fas fa-book-open"></i> Materi</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pertemuan 5 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-number">05</div>
+                    <div class="card-title">
+                        <h4>Docker Hub & Registry</h4>
+                        <span>Minggu 5</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>
+                        Mempelajari cara berbagi Docker Image melalui Docker Hub. 
+                        Push dan pull image, image tagging strategy, 
+                        dan best practices untuk versioning.
+                    </p>
+                </div>
+                <div class="card-topics">
+                    <h5>Topik Pembelajaran</h5>
+                    <div class="topics-list">
+                        <span class="topic-tag">Docker Hub</span>
+                        <span class="topic-tag">docker push</span>
+                        <span class="topic-tag">docker pull</span>
+                        <span class="topic-tag">Image Tagging</span>
+                        <span class="topic-tag">Versioning</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="difficulty">
+                        <span>Kesulitan:</span>
+                        <div class="difficulty-dots">
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot"></span>
+                            <span class="difficulty-dot"></span>
+                        </div>
+                    </div>
+                    <div class="card-buttons">
+                        <a href="pertemuan-05/laporan.html" class="btn-laporan"><i class="fas fa-edit"></i> Laporan</a>
+                        <a href="pertemuan-05/README.md" class="btn-view"><i class="fas fa-book-open"></i> Materi</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pertemuan 6 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-number">06</div>
+                    <div class="card-title">
+                        <h4>Pengenalan Kubernetes</h4>
+                        <span>Minggu 6</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>
+                        Memahami konsep Kubernetes untuk orchestration container. 
+                        Instalasi Minikube, mengenal komponen K8s (Pod, Node, Cluster), 
+                        dan perintah kubectl dasar.
+                    </p>
+                </div>
+                <div class="card-topics">
+                    <h5>Topik Pembelajaran</h5>
+                    <div class="topics-list">
+                        <span class="topic-tag">Kubernetes Concept</span>
+                        <span class="topic-tag">Minikube</span>
+                        <span class="topic-tag">kubectl</span>
+                        <span class="topic-tag">Pods</span>
+                        <span class="topic-tag">Cluster</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="difficulty">
+                        <span>Kesulitan:</span>
+                        <div class="difficulty-dots">
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot"></span>
+                        </div>
+                    </div>
+                    <div class="card-buttons">
+                        <a href="pertemuan-06/laporan.html" class="btn-laporan"><i class="fas fa-edit"></i> Laporan</a>
+                        <a href="pertemuan-06/README.md" class="btn-view"><i class="fas fa-book-open"></i> Materi</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pertemuan 7 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-number">07</div>
+                    <div class="card-title">
+                        <h4>K8s Deployment & Service</h4>
+                        <span>Minggu 7</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>
+                        Praktik membuat Deployment untuk mengelola Pod dan 
+                        Service untuk mengekspos aplikasi. Belajar scaling 
+                        dan load balancing di Kubernetes.
+                    </p>
+                </div>
+                <div class="card-topics">
+                    <h5>Topik Pembelajaran</h5>
+                    <div class="topics-list">
+                        <span class="topic-tag">Deployment</span>
+                        <span class="topic-tag">ReplicaSet</span>
+                        <span class="topic-tag">Service</span>
+                        <span class="topic-tag">NodePort</span>
+                        <span class="topic-tag">Scaling</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="difficulty">
+                        <span>Kesulitan:</span>
+                        <div class="difficulty-dots">
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot active"></span>
+                        </div>
+                    </div>
+                    <div class="card-buttons">
+                        <a href="pertemuan-07/laporan.html" class="btn-laporan"><i class="fas fa-edit"></i> Laporan</a>
+                        <a href="pertemuan-07/README.md" class="btn-view"><i class="fas fa-book-open"></i> Materi</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pertemuan 8 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-number">08</div>
+                    <div class="card-title">
+                        <h4>UTS - Project</h4>
+                        <span>Minggu 8</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>
+                        Ujian Tengah Semester dengan project Docker Compose. 
+                        Membuat aplikasi CRUD (Todo List/Notes/Perpustakaan) 
+                        dengan Flask dan MySQL. Template code disediakan.
+                    </p>
+                </div>
+                <div class="card-topics">
+                    <h5>Topik Pembelajaran</h5>
+                    <div class="topics-list">
+                        <span class="topic-tag">Project</span>
+                        <span class="topic-tag">CRUD App</span>
+                        <span class="topic-tag">Flask + MySQL</span>
+                        <span class="topic-tag">Docker Compose</span>
+                        <span class="topic-tag">Assessment</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="difficulty">
+                        <span>Kesulitan:</span>
+                        <div class="difficulty-dots">
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot active"></span>
+                            <span class="difficulty-dot active"></span>
+                        </div>
+                    </div>
+                    <div class="card-buttons">
+                        <a href="pertemuan-08/laporan.html" class="btn-laporan" style="border-color:#ffd700;color:#ffd700;"><i class="fas fa-star"></i> UTS</a>
+                        <a href="pertemuan-08/README.md" class="btn-view"><i class="fas fa-book-open"></i> Materi</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="learning-path">
+        <div class="section-title">
+            <h3>🛠️ Tools & Technologies</h3>
+            <p>Yang akan dipelajari selama praktikum</p>
+        </div>
+        <div class="path-container">
+            <div class="path-item">
+                <div class="path-icon" style="background: #2496ed;"><i class="fab fa-docker"></i></div>
+                <h5>Docker</h5>
+                <p>Containerization</p>
+            </div>
+            <div class="path-item">
+                <div class="path-icon" style="background: #326ce5;"><i class="fas fa-dharmachakra"></i></div>
+                <h5>Kubernetes</h5>
+                <p>Orchestration</p>
+            </div>
+            <div class="path-item">
+                <div class="path-icon" style="background: #3776ab;"><i class="fab fa-python"></i></div>
+                <h5>Python/Flask</h5>
+                <p>Web Framework</p>
+            </div>
+            <div class="path-item">
+                <div class="path-icon" style="background: #4479a1;"><i class="fas fa-database"></i></div>
+                <h5>MySQL</h5>
+                <p>Database</p>
+            </div>
+            <div class="path-item">
+                <div class="path-icon" style="background: #181717;"><i class="fab fa-github"></i></div>
+                <h5>Git/GitHub</h5>
+                <p>Version Control</p>
+            </div>
+            <div class="path-item">
+                <div class="path-icon" style="background: #007acc;"><i class="fas fa-code"></i></div>
+                <h5>VS Code</h5>
+                <p>Editor</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>
+            Made with ❤️ for Cloud Native Practicum<br>
+            <a href="https://github.com" target="_blank">View on GitHub</a>
+        </p>
+    </footer>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Card animation on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

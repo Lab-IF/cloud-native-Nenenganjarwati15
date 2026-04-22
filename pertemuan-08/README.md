@@ -1,394 +1,199 @@
-# Pertemuan 8: UTS - Containerized Application Deployment
-
-## 🎯 Tujuan UTS
-
-Evaluasi pemahaman mahasiswa terhadap:
-1. Docker containerization
-2. Docker Compose orchestration
-3. Kubernetes deployment
-4. Cloud-native best practices
-5. Documentation dan troubleshooting
-
-## 📋 Project Requirements
-
-### Pilihan Project
-
-**Option 1: Multi-Tier Web Application**
-- Frontend (React/Vue/Angular)
-- Backend API (Node.js/Python/Go)
-- Database (PostgreSQL/MongoDB)
-- Cache (Redis)
-
-**Option 2: Microservices E-commerce**
-- Product Service
-- User Service
-- Order Service
-- Payment Service
-- API Gateway
-
-**Option 3: Content Management System**
-- CMS Application (WordPress/Strapi)
-- Database
-- Object Storage
-- CDN/Reverse Proxy
-
-## 📝 Project Structure
-
-### Part 1: Dockerization (25 points)
-
-**Requirements:**
-- Dockerfile untuk setiap service
-- Multi-stage builds
-- Optimized image size (< 500MB total)
-- Security best practices
-- Health checks
-
-**Deliverables:**
-```
-project/
-├── frontend/
-│   ├── Dockerfile
-│   ├── .dockerignore
-│   └── src/
-├── backend/
-│   ├── Dockerfile
-│   ├── .dockerignore
-│   └── app/
-└── database/
-    └── init-scripts/
-```
-
-### Part 2: Docker Compose (25 points)
-
-**Requirements:**
-- docker-compose.yml
-- Service dependencies
-- Network configuration
-- Volume management
-- Environment variables
-- Service scaling
-
-**Example:**
-```yaml
-version: '3.8'
-
-services:
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    environment:
-      - API_URL=http://backend:5000
-
-  backend:
-    build: ./backend
-    ports:
-      - "5000:5000"
-    depends_on:
-      - database
-      - redis
-    environment:
-      - DB_HOST=database
-      - REDIS_HOST=redis
-
-  database:
-    image: postgres:15
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-
-  redis:
-    image: redis:7-alpine
-
-volumes:
-  db-data:
-```
-
-### Part 3: Kubernetes Deployment (30 points)
-
-**Requirements:**
-- Deployment manifests
-- Service definitions
-- ConfigMaps & Secrets
-- Resource limits
-- Probes (liveness & readiness)
-- Horizontal Pod Autoscaling (bonus)
-
-**Manifests:**
-```
-k8s/
-├── namespace.yaml
-├── deployments/
-│   ├── frontend-deployment.yaml
-│   ├── backend-deployment.yaml
-│   └── database-deployment.yaml
-├── services/
-│   ├── frontend-service.yaml
-│   ├── backend-service.yaml
-│   └── database-service.yaml
-├── configmaps/
-│   └── app-config.yaml
-└── secrets/
-    └── db-secrets.yaml
-```
-
-### Part 4: CI/CD Pipeline (10 points)
-
-**Requirements:**
-- GitHub Actions atau GitLab CI
-- Automated build
-- Image push to registry
-- Basic tests
-
-**Example workflow:**
-```yaml
-name: Build and Push
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Build Docker image
-        run: docker build -t myapp:${{ github.sha }} .
-      
-      - name: Push to registry
-        run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push myapp:${{ github.sha }}
-```
-
-### Part 5: Documentation (10 points)
-
-**Requirements:**
-- Architecture diagram
-- Setup instructions
-- API documentation
-- Troubleshooting guide
-- Performance considerations
-
-## ✅ Rubrik Penilaian
-
-| Komponen | Points | Kriteria |
-|----------|--------|----------|
-| **Dockerization** | 25 | Multi-stage, optimized, secure |
-| **Docker Compose** | 25 | All services working, proper networking |
-| **Kubernetes** | 30 | Deployments, services, scaling |
-| **CI/CD** | 10 | Automated pipeline working |
-| **Documentation** | 10 | Clear, complete, professional |
-| **Code Quality** | 10 | Clean, organized, commented |
-| **Demo** | 10 | Live demonstration |
-| **TOTAL** | **120** | **Normalized to 100** |
-
-## 📤 Deliverables
-
-### 1. Source Code Structure
-
-```
-NIM_Nama_UTS/
-├── docker/
-│   ├── frontend/Dockerfile
-│   ├── backend/Dockerfile
-│   └── docker-compose.yml
-├── kubernetes/
-│   ├── deployments/
-│   ├── services/
-│   └── configs/
-├── .github/workflows/
-│   └── ci.yml
-├── docs/
-│   ├── README.md
-│   ├── ARCHITECTURE.md
-│   ├── API.md
-│   └── DEPLOYMENT.md
-└── src/
-    ├── frontend/
-    └── backend/
-```
-
-### 2. Documentation Requirements
-
-**README.md:**
-- Project overview
-- Architecture diagram
-- Prerequisites
-- Quick start guide
-- Environment variables
-- Troubleshooting
-
-**ARCHITECTURE.md:**
-- System design
-- Component interactions
-- Technology stack
-- Scalability considerations
-
-**DEPLOYMENT.md:**
-- Docker deployment steps
-- Kubernetes deployment steps
-- Monitoring setup
-- Backup/restore procedures
-
-## 💡 Grading Criteria
-
-### Excellent (90-100)
-- All services containerized perfectly
-- Kubernetes deployment production-ready
-- CI/CD fully automated
-- Comprehensive documentation
-- Advanced features (monitoring, auto-scaling)
-
-### Good (80-89)
-- Services containerized well
-- Kubernetes deployment working
-- Basic CI/CD
-- Good documentation
-- Most features implemented
-
-### Satisfactory (70-79)
-- Basic containerization
-- Kubernetes partially working
-- Manual deployment process
-- Basic documentation
-- Core features only
-
-### Needs Improvement (<70)
-- Incomplete containerization
-- Kubernetes not working
-- No automation
-- Poor documentation
-
-## 🚫 Common Mistakes to Avoid
-
-1. ❌ Hardcoded configurations
-2. ❌ No health checks
-3. ❌ Missing resource limits
-4. ❌ Root user in containers
-5. ❌ Large image sizes
-6. ❌ No documentation
-7. ❌ Services can't communicate
-8. ❌ No error handling
-
-## ✅ Best Practices Checklist
-
-- [ ] All images < 500MB
-- [ ] Non-root users
-- [ ] Health checks configured
-- [ ] Resource limits set
-- [ ] Secrets not in code
-- [ ] Services properly networked
-- [ ] Documentation complete
-- [ ] CI/CD pipeline working
-- [ ] Can deploy from scratch
-- [ ] Logs accessible
-
-## 📊 Example Projects
-
-### Example 1: Blog Platform
-- Frontend: React
-- Backend: Node.js + Express
-- Database: PostgreSQL
-- Cache: Redis
-- Features: CRUD, Auth, Comments
-
-### Example 2: Task Manager
-- Frontend: Vue.js
-- Backend: Python + Flask
-- Database: MongoDB
-- Queue: RabbitMQ
-- Features: Tasks, Users, Notifications
-
-### Example 3: API Gateway
-- Gateway: Kong/Traefik
-- Service 1: User API
-- Service 2: Product API
-- Database: MySQL
-- Features: Rate limiting, Auth
-
-## 📧 Submission
-
-**Deadline:** [Sesuai jadwal - Pertemuan 8]
-
-**Format:** 
-- GitHub repository URL
-- Or `NIM_Nama_UTS_CloudNative.zip`
-
-**Upload:** LMS
-
-**Late Submission:**
-- 1 day: -10 points
-- 2 days: -20 points
-- 3+ days: -50 points
-
-## ❓ FAQ
-
-**Q: Boleh pakai existing open-source project?**
-A: Boleh, tapi harus ada modifikasi dan improvement significant.
-
-**Q: Harus deploy ke cloud?**
-A: Tidak wajib. Minikube sudah cukup.
-
-**Q: Berapa minimal services?**
-A: Minimal 3 services (frontend, backend, database).
-
-**Q: Boleh pakai managed databases?**
-A: Untuk UTS, sebaiknya containerized semua.
-
-## 🎯 Tips Sukses
-
-### Technical
-1. Test Docker compose first
-2. Then move to Kubernetes
-3. Use version control
-4. Implement incrementally
-5. Test each component
-
-### Time Management
-- Week 1: Dockerization
-- Week 2: Kubernetes
-- Week 3: CI/CD & Documentation
-- Week 4: Testing & Demo prep
-
-### Documentation
-1. Start documentation early
-2. Screenshot key steps
-3. Document errors and solutions
-4. Include architecture diagrams
-
-## 🔗 Resources
-
-- [Docker Samples](https://github.com/docker/awesome-compose)
-- [Kubernetes Examples](https://github.com/kubernetes/examples)
-- [12-Factor App](https://12factor.net/)
+# 📝 Pertemuan 8: UTS - Project Docker Compose
+
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![UTS](https://img.shields.io/badge/UTS-Final%20Project-red?style=for-the-badge)
 
 ---
 
-## 📋 Final Checklist
+## 🎯 Deskripsi Project
 
-Before submission:
+> Buat aplikasi **Todo List** full-stack menggunakan **Docker Compose**
 
-- [ ] Docker Compose starts all services
-- [ ] Kubernetes deploys successfully
-- [ ] All health checks passing
-- [ ] Services can communicate
-- [ ] CI/CD pipeline runs
-- [ ] Documentation complete
-- [ ] Architecture diagram included
-- [ ] Demo video ready (optional)
-- [ ] Code clean and organized
-- [ ] Repository well-structured
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                      🎯 TODO LIST APP                              │
+│                                                                    │
+│   ┌──────────────────┐         ┌──────────────────┐               │
+│   │                  │         │                  │               │
+│   │   🌐 FLASK WEB   │◄───────►│   🐬 MySQL DB    │               │
+│   │    (Frontend +   │   SQL   │    (Data Store)  │               │
+│   │     Backend)     │         │                  │               │
+│   │                  │         │                  │               │
+│   └────────┬─────────┘         └────────┬─────────┘               │
+│            │                            │                          │
+│            │         Docker Compose     │                          │
+│            └────────────────────────────┘                          │
+│                                                                    │
+└────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-**Build Something Amazing! 🚀☁️**
+## 📋 Ketentuan
 
-**Remember:** This is your chance to showcase everything learned in pertemuan 1-7. Make it production-quality!
+| No | Requirement | Keterangan |
+|----|-------------|------------|
+| 1 | Backend | Flask (Python) |
+| 2 | Database | MySQL 8.0 |
+| 3 | Orchestration | Docker Compose |
+| 4 | Persistence | Volume untuk database |
 
-**Questions?** Contact asisten praktikum or discuss in class forum.
+---
+
+## ✨ Fitur Minimum
+
+- [x] ➕ **Create** - Tambah todo baru
+- [x] 📖 **Read** - Tampilkan semua todos
+- [x] ✏️ **Update** - Tandai todo selesai/belum
+- [x] 🗑️ **Delete** - Hapus todo
+
+---
+
+## 📁 Struktur Project
+
+```
+uts-[NIM]/
+├── 📄 docker-compose.yml     # Orchestration
+├── 📄 init.sql                # Database initialization
+├── 📄 README.md               # Dokumentasi
+└── 📁 app/
+    ├── 📄 Dockerfile          # Build image Flask
+    ├── 📄 requirements.txt    # Python dependencies
+    ├── 📄 app.py              # Flask application
+    └── 📁 templates/
+        └── 📄 index.html      # Frontend HTML
+```
+
+---
+
+## 📊 Rubrik Penilaian
+
+| Kriteria | Poin | Penjelasan |
+|----------|------|------------|
+| 🐳 Docker Compose berjalan | **20** | `docker-compose up -d` berhasil |
+| 🔗 Web & DB terhubung | **15** | Flask bisa CRUD ke MySQL |
+| ➕ Create todo | **15** | Tambah todo berfungsi |
+| 📖 Read todos | **10** | Tampilkan semua todos |
+| ✏️ Update status | **10** | Toggle done/undone |
+| 🗑️ Delete todo | **10** | Hapus todo berfungsi |
+| 💾 Database persistent | **10** | Data tetap ada setelah restart |
+| 📝 README dokumentasi | **5** | Ada screenshot & cara pakai |
+| 🎨 UI rapi | **5** | Tampilan menarik |
+| **Total** | **100** | |
+
+> ⚠️ **Minimum Lulus: 60 Poin**
+
+---
+
+## 🚀 Cara Menjalankan
+
+```bash
+# Clone/extract project
+cd uts-[NIM]
+
+# Jalankan
+docker-compose up -d --build
+
+# Tunggu MySQL siap (30 detik)
+docker-compose logs -f database
+
+# Buka browser
+# http://localhost:5000
+
+# Stop
+docker-compose down
+
+# Stop + hapus data
+docker-compose down -v
+```
+
+---
+
+## 📤 Pengumpulan
+
+### 📁 Struktur Folder Pengumpulan
+```
+pertemuan-08/
+├── 📄 README.md          # Materi UTS (file ini)
+├── 📄 LAPORAN.md         # ⬅️ ISI LAPORAN UTS DI SINI!
+└── 📁 ss/                # ⬅️ SIMPAN SCREENSHOT DI SINI!
+    ├── 01-struktur-folder.png
+    ├── 02-compose-up.png
+    ├── 03-compose-ps.png
+    ├── 04-tampilan-awal.png
+    ├── 05-create-todo.png
+    ├── 06-read-todos.png
+    ├── 07-update-todo.png
+    ├── 08-delete-todo.png
+    ├── 09a-before-restart.png
+    ├── 09b-restart.png
+    ├── 09c-after-restart.png
+    └── 10-docker-volume.png
+```
+
+### 📝 Cara Mengerjakan:
+1. **Kode Project** → Buat di folder terpisah `uts-[NIM]/`
+2. **Screenshot** → Simpan di folder `ss/`
+3. **Laporan** → Edit file `LAPORAN.md`
+4. **Paste semua kode** di laporan
+
+> 📋 **Template Laporan UTS:** [Klik di sini untuk mengisi LAPORAN.md](LAPORAN.md)
+
+### Checklist Sebelum Submit:
+- [ ] `docker-compose up -d --build` berjalan tanpa error
+- [ ] Semua fitur CRUD berfungsi
+- [ ] Data tetap ada setelah `docker-compose down` lalu `up` lagi
+- [ ] LAPORAN.md lengkap dengan screenshot
+- [ ] Semua screenshot ada di folder `ss/`
+
+---
+
+## ⚠️ Catatan Penting
+
+> 🚨 **PLAGIARISME = NILAI 0**
+
+- Boleh diskusi, tapi kerjakan sendiri
+- Setiap mahasiswa harus bisa menjelaskan kodenya
+- Tulis nama & NIM di app dan README
+
+---
+
+## 📅 Deadline
+
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│    📅 Sesuai Jadwal UTS                     │
+│                                             │
+│    ⏰ Tidak ada perpanjangan waktu!         │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+## 📖 Referensi Template
+
+> Lihat halaman web `pertemuan-08/index.html` untuk template kode lengkap!
+
+---
+
+## 🆘 Butuh Bantuan?
+
+- 📧 Hubungi dosen/asisten
+- 📚 Lihat materi pertemuan 1-7
+- 🔗 Google & Stack Overflow
+
+---
+
+<div align="center">
+
+[⬅️ Pertemuan 7](../pertemuan-07/README.md) | **📅 UTS - Pertemuan 8** | [🏠 Home](../README.md)
+
+---
+
+### 🍀 Good Luck!
+
+</div>

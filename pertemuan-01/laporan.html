@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Laporan - Pertemuan 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        h1 span {
+            color: #00d4ff;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card h2 {
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0,212,255,0.3);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .screenshot-item {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .screenshot-item h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,212,255,0.1);
+            border: 2px dashed rgba(0,212,255,0.5);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,212,255,0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .preview-section {
+            background: #0d1117;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .preview-section h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+        }
+
+        .preview-content {
+            background: #161b22;
+            padding: 20px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 400px;
+            overflow-y: auto;
+            color: #c9d1d9;
+        }
+
+        .info-box {
+            background: rgba(0,212,255,0.1);
+            border-left: 4px solid #00d4ff;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+        }
+
+        .info-box p {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .nav-link {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-link a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+
+        .nav-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-link">
+            <a href="README.md">📖 Lihat Materi</a> | 
+            <a href="index.html">🌐 Lihat Web</a> |
+            <a href="../index.html">🏠 Home</a>
+        </div>
+
+        <h1>📝 Form Laporan <span>Pertemuan 1</span></h1>
+        <p class="subtitle">Pengenalan Docker dan Containerization</p>
+
+        <div class="info-box">
+            <p>💡 <strong>Petunjuk:</strong> Isi semua form di bawah ini, lalu klik "Download LAPORAN.md" untuk mendapatkan file laporan yang sudah terisi otomatis!</p>
+        </div>
+
+        <!-- Identitas -->
+        <div class="card">
+            <h2>👤 Identitas Mahasiswa</h2>
+            <div class="row">
+                <div class="form-group">
+                    <label>Nama Lengkap *</label>
+                    <input type="text" id="nama" placeholder="Contoh: Budi Santoso" required>
+                </div>
+                <div class="form-group">
+                    <label>NIM *</label>
+                    <input type="text" id="nim" placeholder="Contoh: 12345678" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Kelas *</label>
+                    <input type="text" id="kelas" placeholder="Contoh: TI-3A" required>
+                </div>
+                <div class="form-group">
+                    <label>Tanggal Praktikum *</label>
+                    <input type="date" id="tanggal" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist -->
+        <div class="card">
+            <h2>✅ Checklist Tugas</h2>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task1">
+                <label for="task1">Install Docker di komputer</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task2">
+                <label for="task2">Jalankan <code>docker --version</code></label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task3">
+                <label for="task3">Jalankan <code>docker run hello-world</code></label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task4">
+                <label for="task4">Jalankan <code>docker images</code></label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="task5">
+                <label for="task5">Screenshot semua hasil</label>
+            </div>
+        </div>
+
+        <!-- Screenshots -->
+        <div class="card">
+            <h2>🖼️ Upload Screenshot</h2>
+            <p style="color: #888; margin-bottom: 15px;">Upload screenshot hasil praktikum. File akan otomatis disimpan dengan nama yang benar.</p>
+
+            <div class="screenshot-item">
+                <h4>1️⃣ Screenshot Docker Version</h4>
+                <div class="file-input-wrapper">
+                    <input type="file" id="ss1" accept="image/*" onchange="previewImage(this, 'preview1')">
+                </div>
+                <img id="preview1" class="preview-img">
+                <div class="form-group" style="margin-top: 10px;">
+                    <label>Penjelasan:</label>
+                    <textarea id="penjelasan1" placeholder="Contoh: Docker versi 24.0.5 berhasil terinstall"></textarea>
+                </div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>2️⃣ Screenshot Hello World</h4>
+                <div class="file-input-wrapper">
+                    <input type="file" id="ss2" accept="image/*" onchange="previewImage(this, 'preview2')">
+                </div>
+                <img id="preview2" class="preview-img">
+                <div class="form-group" style="margin-top: 10px;">
+                    <label>Penjelasan:</label>
+                    <textarea id="penjelasan2" placeholder="Contoh: Container hello-world berhasil dijalankan dan menampilkan pesan sukses"></textarea>
+                </div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>3️⃣ Screenshot Docker Images</h4>
+                <div class="file-input-wrapper">
+                    <input type="file" id="ss3" accept="image/*" onchange="previewImage(this, 'preview3')">
+                </div>
+                <img id="preview3" class="preview-img">
+                <div class="form-group" style="margin-top: 10px;">
+                    <label>Penjelasan:</label>
+                    <textarea id="penjelasan3" placeholder="Contoh: Terdapat image hello-world yang sudah didownload"></textarea>
+                </div>
+            </div>
+
+            <div class="screenshot-item">
+                <h4>4️⃣ Screenshot Docker PS -a</h4>
+                <div class="file-input-wrapper">
+                    <input type="file" id="ss4" accept="image/*" onchange="previewImage(this, 'preview4')">
+                </div>
+                <img id="preview4" class="preview-img">
+                <div class="form-group" style="margin-top: 10px;">
+                    <label>Penjelasan:</label>
+                    <textarea id="penjelasan4" placeholder="Contoh: Terlihat container hello-world dengan status Exited"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kendala -->
+        <div class="card">
+            <h2>⚠️ Kendala & Solusi</h2>
+            <div class="form-group">
+                <label>Kendala yang Dihadapi:</label>
+                <textarea id="kendala" placeholder="Contoh: Permission denied saat menjalankan docker&#10;&#10;Jika tidak ada kendala, tulis: Tidak ada kendala"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Solusi:</label>
+                <textarea id="solusi" placeholder="Contoh: Menambahkan user ke group docker dengan perintah sudo usermod -aG docker $USER"></textarea>
+            </div>
+        </div>
+
+        <!-- Kesimpulan -->
+        <div class="card">
+            <h2>💡 Kesimpulan</h2>
+            <div class="form-group">
+                <label>Tulis kesimpulan dari praktikum ini:</label>
+                <textarea id="kesimpulan" style="min-height: 150px;" placeholder="Contoh:
+- Docker adalah platform untuk containerization
+- Container lebih ringan dibanding virtual machine
+- Docker mempermudah deployment aplikasi
+- Perintah dasar docker: run, ps, images"></textarea>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="buttons">
+            <button class="btn btn-secondary" onclick="previewMarkdown()">👁️ Preview Laporan</button>
+            <button class="btn btn-primary" onclick="downloadMarkdown()">📥 Download LAPORAN.md</button>
+            <button class="btn btn-success" onclick="downloadScreenshots()">📸 Download Screenshots</button>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="preview-section" id="previewSection">
+            <h3>📄 Preview LAPORAN.md</h3>
+            <div class="preview-content" id="previewContent"></div>
+        </div>
+    </div>
+
+    <div class="success-message" id="successMsg">✅ Berhasil!</div>
+
+    <script>
+        // Set tanggal hari ini sebagai default
+        document.getElementById('tanggal').valueAsDate = new Date();
+
+        // Preview image saat upload
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Generate markdown content
+        function generateMarkdown() {
+            const nama = document.getElementById('nama').value || '[Tulis nama lengkap]';
+            const nim = document.getElementById('nim').value || '[Tulis NIM]';
+            const kelas = document.getElementById('kelas').value || '[Tulis kelas]';
+            const tanggal = document.getElementById('tanggal').value || '[DD/MM/YYYY]';
+            
+            const task1 = document.getElementById('task1').checked ? '✅ Sudah' : '⬜ Belum';
+            const task2 = document.getElementById('task2').checked ? '✅ Sudah' : '⬜ Belum';
+            const task3 = document.getElementById('task3').checked ? '✅ Sudah' : '⬜ Belum';
+            const task4 = document.getElementById('task4').checked ? '✅ Sudah' : '⬜ Belum';
+            const task5 = document.getElementById('task5').checked ? '✅ Sudah' : '⬜ Belum';
+
+            const penjelasan1 = document.getElementById('penjelasan1').value || '[Tulis penjelasan]';
+            const penjelasan2 = document.getElementById('penjelasan2').value || '[Tulis penjelasan]';
+            const penjelasan3 = document.getElementById('penjelasan3').value || '[Tulis penjelasan]';
+            const penjelasan4 = document.getElementById('penjelasan4').value || '[Tulis penjelasan]';
+
+            const kendala = document.getElementById('kendala').value || 'Tidak ada kendala';
+            const solusi = document.getElementById('solusi').value || '-';
+            const kesimpulan = document.getElementById('kesimpulan').value || '[Tulis kesimpulan]';
+
+            // Format tanggal
+            const tglFormatted = tanggal ? new Date(tanggal).toLocaleDateString('id-ID') : '[DD/MM/YYYY]';
+
+            return `# 📝 Laporan Praktikum - Pertemuan 1
+
+## 🐳 Pengenalan Docker dan Containerization
+
+---
+
+## 👤 Identitas Mahasiswa
+
+| Field | Isi |
+|-------|-----|
+| **Nama** | ${nama} |
+| **NIM** | ${nim} |
+| **Kelas** | ${kelas} |
+| **Tanggal Praktikum** | ${tglFormatted} |
+
+---
+
+## 📋 Hasil Praktikum
+
+### ✅ Checklist Tugas
+
+| No | Tugas | Status |
+|----|-------|--------|
+| 1 | Install Docker | ${task1} |
+| 2 | Jalankan \`docker --version\` | ${task2} |
+| 3 | Jalankan \`docker run hello-world\` | ${task3} |
+| 4 | Jalankan \`docker images\` | ${task4} |
+| 5 | Screenshot semua hasil | ${task5} |
+
+---
+
+## 🖼️ Screenshot Hasil
+
+> **📁 Screenshot disimpan di folder:** \`pertemuan-01/ss/\`
+
+### 1️⃣ Screenshot Docker Version
+
+![Docker Version](ss/01-docker-version.png)
+
+**Penjelasan:**
+\`\`\`
+${penjelasan1}
+\`\`\`
+
+---
+
+### 2️⃣ Screenshot Hello World
+
+![Hello World](ss/02-hello-world.png)
+
+**Penjelasan:**
+\`\`\`
+${penjelasan2}
+\`\`\`
+
+---
+
+### 3️⃣ Screenshot Docker Images
+
+![Docker Images](ss/03-docker-images.png)
+
+**Penjelasan:**
+\`\`\`
+${penjelasan3}
+\`\`\`
+
+---
+
+### 4️⃣ Screenshot Docker PS -a
+
+![Docker PS](ss/04-docker-ps.png)
+
+**Penjelasan:**
+\`\`\`
+${penjelasan4}
+\`\`\`
+
+---
+
+## 📝 Catatan & Kendala
+
+### Kendala yang Dihadapi:
+\`\`\`
+${kendala}
+\`\`\`
+
+### Solusi:
+\`\`\`
+${solusi}
+\`\`\`
+
+---
+
+## 💡 Kesimpulan
+
+\`\`\`
+${kesimpulan}
+\`\`\`
+
+---
+
+## 📊 Penilaian
+
+> *Diisi oleh Dosen/Asisten*
+
+| Kriteria | Nilai |
+|----------|-------|
+| Kelengkapan Screenshot | /25 |
+| Kebenaran Output | /25 |
+| Penjelasan | /25 |
+| Kesimpulan | /25 |
+| **Total** | **/100** |
+
+**Catatan Penilai:**
+\`\`\`
+
+\`\`\`
+
+---
+
+<div align="center">
+
+📅 **Pertemuan 1** | [🏠 Kembali ke README](README.md)
+
+</div>
+`;
+        }
+
+        // Preview markdown
+        function previewMarkdown() {
+            const content = generateMarkdown();
+            document.getElementById('previewContent').textContent = content;
+            document.getElementById('previewSection').style.display = 'block';
+            document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Download markdown
+        function downloadMarkdown() {
+            const content = generateMarkdown();
+            const blob = new Blob([content], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'LAPORAN.md';
+            a.click();
+            URL.revokeObjectURL(url);
+            showSuccess('LAPORAN.md berhasil didownload!');
+        }
+
+        // Download screenshots as zip (simplified - downloads individually)
+        function downloadScreenshots() {
+            const files = [
+                { input: 'ss1', name: '01-docker-version' },
+                { input: 'ss2', name: '02-hello-world' },
+                { input: 'ss3', name: '03-docker-images' },
+                { input: 'ss4', name: '04-docker-ps' }
+            ];
+
+            let downloaded = 0;
+            files.forEach(file => {
+                const input = document.getElementById(file.input);
+                if (input.files && input.files[0]) {
+                    const originalFile = input.files[0];
+                    const ext = originalFile.name.split('.').pop();
+                    const blob = originalFile;
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${file.name}.${ext}`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    downloaded++;
+                }
+            });
+
+            if (downloaded > 0) {
+                showSuccess(`${downloaded} screenshot berhasil didownload!`);
+            } else {
+                alert('Tidak ada screenshot yang diupload!');
+            }
+        }
+
+        // Show success message
+        function showSuccess(msg) {
+            const el = document.getElementById('successMsg');
+            el.textContent = '✅ ' + msg;
+            el.style.display = 'block';
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 3000);
+        }
+
+        // Auto-save to localStorage
+        function saveToLocal() {
+            const data = {
+                nama: document.getElementById('nama').value,
+                nim: document.getElementById('nim').value,
+                kelas: document.getElementById('kelas').value,
+                tanggal: document.getElementById('tanggal').value,
+                task1: document.getElementById('task1').checked,
+                task2: document.getElementById('task2').checked,
+                task3: document.getElementById('task3').checked,
+                task4: document.getElementById('task4').checked,
+                task5: document.getElementById('task5').checked,
+                penjelasan1: document.getElementById('penjelasan1').value,
+                penjelasan2: document.getElementById('penjelasan2').value,
+                penjelasan3: document.getElementById('penjelasan3').value,
+                penjelasan4: document.getElementById('penjelasan4').value,
+                kendala: document.getElementById('kendala').value,
+                solusi: document.getElementById('solusi').value,
+                kesimpulan: document.getElementById('kesimpulan').value
+            };
+            localStorage.setItem('laporan_pertemuan1', JSON.stringify(data));
+        }
+
+        // Load from localStorage
+        function loadFromLocal() {
+            const saved = localStorage.getItem('laporan_pertemuan1');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('nama').value = data.nama || '';
+                document.getElementById('nim').value = data.nim || '';
+                document.getElementById('kelas').value = data.kelas || '';
+                document.getElementById('tanggal').value = data.tanggal || '';
+                document.getElementById('task1').checked = data.task1 || false;
+                document.getElementById('task2').checked = data.task2 || false;
+                document.getElementById('task3').checked = data.task3 || false;
+                document.getElementById('task4').checked = data.task4 || false;
+                document.getElementById('task5').checked = data.task5 || false;
+                document.getElementById('penjelasan1').value = data.penjelasan1 || '';
+                document.getElementById('penjelasan2').value = data.penjelasan2 || '';
+                document.getElementById('penjelasan3').value = data.penjelasan3 || '';
+                document.getElementById('penjelasan4').value = data.penjelasan4 || '';
+                document.getElementById('kendala').value = data.kendala || '';
+                document.getElementById('solusi').value = data.solusi || '';
+                document.getElementById('kesimpulan').value = data.kesimpulan || '';
+            }
+        }
+
+        // Auto-save on input change
+        document.querySelectorAll('input, textarea').forEach(el => {
+            el.addEventListener('change', saveToLocal);
+            el.addEventListener('input', saveToLocal);
+        });
+
+        // Load saved data on page load
+        loadFromLocal();
+    </script>
+</body>
+</html>

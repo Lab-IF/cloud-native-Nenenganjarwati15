@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertemuan 2 - Docker Images & Dockerfile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; line-height: 1.7; }
+        .nav { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); padding: 15px 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #1e293b; }
+        .nav-content { max-width: 1000px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: #94a3b8; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.3s; }
+        .nav a:hover { color: #7c3aed; }
+        .nav-title { font-weight: 600; color: #f1f5f9; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 50px; padding: 40px; background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(0, 212, 255, 0.1)); border-radius: 20px; border: 1px solid rgba(124, 58, 237, 0.2); }
+        .header-badge { display: inline-block; background: #7c3aed; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 20px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(90deg, #7c3aed, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { color: #94a3b8; font-size: 1.1rem; }
+        .section { margin-bottom: 40px; }
+        .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; margin-bottom: 20px; color: #f1f5f9; }
+        .section-title i { color: #7c3aed; }
+        .card { background: #1e293b; border-radius: 15px; padding: 25px; margin-bottom: 20px; border: 1px solid #334155; }
+        .card h3 { color: #f1f5f9; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .card h3 i { color: #7c3aed; }
+        .objectives { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .objective-item { background: rgba(124, 58, 237, 0.1); padding: 15px 20px; border-radius: 10px; border-left: 3px solid #7c3aed; display: flex; align-items: center; gap: 12px; }
+        .objective-item i { color: #7c3aed; }
+        .code-block { background: #0f172a; border-radius: 12px; overflow: hidden; margin: 20px 0; border: 1px solid #334155; }
+        .code-header { background: #1e293b; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .code-header span { color: #94a3b8; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .code-header button { background: #334155; border: none; color: #94a3b8; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; transition: all 0.3s; }
+        .code-header button:hover { background: #7c3aed; color: white; }
+        .code-content { padding: 20px; overflow-x: auto; }
+        .code-content pre { font-family: 'Fira Code', monospace; font-size: 0.9rem; color: #e2e8f0; margin: 0; }
+        .code-content .comment { color: #6b7280; }
+        .code-content .command { color: #7c3aed; }
+        .code-content .keyword { color: #f59e0b; }
+        .code-content .string { color: #10b981; }
+        .diagram { background: #0f172a; border-radius: 12px; padding: 30px; margin: 20px 0; border: 1px solid #334155; text-align: center; }
+        .diagram pre { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #94a3b8; display: inline-block; text-align: left; }
+        .info-box { background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .info-box.warning { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+        .info-box.success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
+        .info-box h4 { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .info-box h4 i { color: #7c3aed; }
+        .info-box.warning h4 i { color: #f59e0b; }
+        .info-box.success h4 i { color: #10b981; }
+        .table-container { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 12px; overflow: hidden; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #0f172a; color: #7c3aed; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(124, 58, 237, 0.05); }
+        .steps { counter-reset: step-counter; }
+        .step { position: relative; padding-left: 60px; margin-bottom: 30px; }
+        .step::before { counter-increment: step-counter; content: counter(step-counter); position: absolute; left: 0; top: 0; width: 40px; height: 40px; background: linear-gradient(135deg, #7c3aed, #00d4ff); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; }
+        .step h4 { color: #f1f5f9; margin-bottom: 10px; }
+        .task-card { background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(0, 212, 255, 0.1)); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px; padding: 25px; margin: 20px 0; }
+        .task-card h4 { color: #7c3aed; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .task-points { background: #7c3aed; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; }
+        .footer-nav { display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; border-top: 1px solid #1e293b; }
+        .footer-nav a { display: flex; align-items: center; gap: 10px; color: #94a3b8; text-decoration: none; padding: 15px 25px; background: #1e293b; border-radius: 10px; transition: all 0.3s; }
+        .footer-nav a:hover { background: #7c3aed; color: white; }
+        .file-tree { background: #0f172a; border-radius: 12px; padding: 20px; border: 1px solid #334155; font-family: 'Fira Code', monospace; }
+        .file-tree .folder { color: #f59e0b; }
+        .file-tree .file { color: #10b981; }
+        @media (max-width: 768px) { .header h1 { font-size: 1.8rem; } .step { padding-left: 50px; } }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <a href="../pertemuan-01/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 1</a>
+            <span class="nav-title">Pertemuan 2</span>
+            <a href="../pertemuan-03/index.html">Pertemuan 3 <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <span class="header-badge">Minggu 2</span>
+            <h1>📦 Docker Images & Dockerfile</h1>
+            <p>Belajar membuat Docker Image sendiri menggunakan Dockerfile</p>
+        </header>
+
+        <!-- Objectives -->
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-bullseye"></i> Tujuan Pembelajaran</h2>
+            <div class="objectives">
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Memahami apa itu Docker Image</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Membuat Dockerfile sederhana</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Build custom Docker image</span></div>
+                <div class="objective-item"><i class="fas fa-check-circle"></i><span>Menjalankan aplikasi sendiri dalam container</span></div>
+            </div>
+        </section>
+
+        <!-- Theory -->
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-book"></i> Teori</h2>
+
+            <div class="card">
+                <h3><i class="fas fa-layer-group"></i> Apa itu Docker Image?</h3>
+                <p>Docker Image adalah <strong>template read-only</strong> yang berisi:</p>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li>Operating System (misal: Ubuntu, Alpine)</li>
+                    <li>Aplikasi kita</li>
+                    <li>Dependencies yang dibutuhkan</li>
+                    <li>Konfigurasi</li>
+                </ul>
+                <div class="info-box">
+                    <h4><i class="fas fa-lightbulb"></i> Analogi</h4>
+                    <p><strong>Image</strong> = Resep masakan (tidak berubah)<br>
+                    <strong>Container</strong> = Masakan yang sudah jadi (bisa dibuat banyak dari 1 resep)</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-file-code"></i> Apa itu Dockerfile?</h3>
+                <p>Dockerfile adalah <strong>file teks</strong> berisi instruksi untuk membuat Docker Image.</p>
+                <div class="diagram">
+                    <pre>
+┌─────────────────────────────────────┐
+│           Dockerfile                │
+│  ┌───────────────────────────────┐  │
+│  │ FROM python:3.11              │  │  ← Base image
+│  │ COPY app.py /app/             │  │  ← Copy file
+│  │ CMD ["python", "/app/app.py"] │  │  ← Jalankan
+│  └───────────────────────────────┘  │
+└──────────────────┬──────────────────┘
+                   │ docker build
+                   ▼
+┌─────────────────────────────────────┐
+│         Docker Image                │
+│      (my-python-app:1.0)            │
+└──────────────────┬──────────────────┘
+                   │ docker run
+                   ▼
+┌─────────────────────────────────────┐
+│         Container                   │
+│    (aplikasi berjalan)              │
+└─────────────────────────────────────┘
+                    </pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-list-ol"></i> Instruksi Dockerfile Dasar</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Instruksi</th><th>Fungsi</th><th>Contoh</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>FROM</code></td><td>Base image</td><td><code>FROM python:3.11</code></td></tr>
+                            <tr><td><code>WORKDIR</code></td><td>Set working directory</td><td><code>WORKDIR /app</code></td></tr>
+                            <tr><td><code>COPY</code></td><td>Copy file dari host ke image</td><td><code>COPY . /app</code></td></tr>
+                            <tr><td><code>RUN</code></td><td>Jalankan command saat build</td><td><code>RUN pip install flask</code></td></tr>
+                            <tr><td><code>CMD</code></td><td>Command default saat container jalan</td><td><code>CMD ["python", "app.py"]</code></td></tr>
+                            <tr><td><code>EXPOSE</code></td><td>Dokumentasi port yang digunakan</td><td><code>EXPOSE 5000</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Praktikum -->
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-laptop-code"></i> Praktikum</h2>
+
+            <div class="card">
+                <h3><i class="fas fa-play-circle"></i> Praktik 1: Aplikasi Python Sederhana</h3>
+                
+                <div class="steps">
+                    <div class="step">
+                        <h4>Buat folder project</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="command">mkdir</span> docker-app
+<span class="command">cd</span> docker-app</pre></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <h4>Buat file app.py</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fab fa-python"></i> app.py</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="comment"># app.py</span>
+<span class="keyword">print</span>(<span class="string">"=" * 40</span>)
+<span class="keyword">print</span>(<span class="string">"Halo! Ini aplikasi Python di Docker"</span>)
+<span class="keyword">print</span>(<span class="string">"Nama: [Ganti dengan nama Anda]"</span>)
+<span class="keyword">print</span>(<span class="string">"NIM: [Ganti dengan NIM Anda]"</span>)
+<span class="keyword">print</span>(<span class="string">"=" * 40</span>)</pre></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <h4>Buat file Dockerfile</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fab fa-docker"></i> Dockerfile</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="comment"># Dockerfile</span>
+<span class="keyword">FROM</span> python:3.11-slim
+
+<span class="keyword">WORKDIR</span> /app
+
+<span class="keyword">COPY</span> app.py .
+
+<span class="keyword">CMD</span> [<span class="string">"python"</span>, <span class="string">"app.py"</span>]</pre></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <h4>Build image</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="command">docker</span> build <span class="keyword">-t</span> aplikasi-pertama:1.0 .
+
+<span class="comment"># Penjelasan:</span>
+<span class="comment"># -t aplikasi-pertama:1.0 = nama:tag untuk image</span>
+<span class="comment"># . = lokasi Dockerfile (current directory)</span></pre></div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <h4>Jalankan container</h4>
+                        <div class="code-block">
+                            <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                            <div class="code-content"><pre><span class="command">docker</span> run aplikasi-pertama:1.0</pre></div>
+                        </div>
+                        <div class="info-box success">
+                            <h4><i class="fas fa-check-circle"></i> Output</h4>
+                            <pre>========================================
+Halo! Ini aplikasi Python di Docker
+Nama: [Nama Anda]
+NIM: [NIM Anda]
+========================================</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-globe"></i> Praktik 2: Aplikasi Web Flask</h3>
+                
+                <p>Struktur folder:</p>
+                <div class="file-tree">
+                    <span class="folder">📁 flask-app/</span><br>
+                    &nbsp;&nbsp;├── <span class="file">📄 Dockerfile</span><br>
+                    &nbsp;&nbsp;├── <span class="file">📄 requirements.txt</span><br>
+                    &nbsp;&nbsp;└── <span class="file">📄 app.py</span>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #f1f5f9;">app.py</h4>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fab fa-python"></i> app.py</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="keyword">from</span> flask <span class="keyword">import</span> Flask
+
+app = Flask(__name__)
+
+<span class="keyword">@app.route</span>(<span class="string">'/'</span>)
+<span class="keyword">def</span> home():
+    <span class="keyword">return</span> <span class="string">'''
+    &lt;html&gt;
+    &lt;head&gt;&lt;title&gt;Aplikasi Docker&lt;/title&gt;&lt;/head&gt;
+    &lt;body style="text-align:center; padding:50px;"&gt;
+        &lt;h1&gt;🐳 Hello Docker!&lt;/h1&gt;
+        &lt;p&gt;Aplikasi ini berjalan di dalam container&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Nama:&lt;/strong&gt; [Ganti nama Anda]&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;NIM:&lt;/strong&gt; [Ganti NIM Anda]&lt;/p&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;
+    '''</span>
+
+<span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:
+    app.run(host=<span class="string">'0.0.0.0'</span>, port=5000)</pre></div>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #f1f5f9;">requirements.txt</h4>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-file-alt"></i> requirements.txt</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre>flask==3.0.0</pre></div>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #f1f5f9;">Dockerfile</h4>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fab fa-docker"></i> Dockerfile</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="keyword">FROM</span> python:3.11-slim
+
+<span class="keyword">WORKDIR</span> /app
+
+<span class="comment"># Copy requirements dulu (untuk caching)</span>
+<span class="keyword">COPY</span> requirements.txt .
+
+<span class="comment"># Install dependencies</span>
+<span class="keyword">RUN</span> pip install -r requirements.txt
+
+<span class="comment"># Copy source code</span>
+<span class="keyword">COPY</span> app.py .
+
+<span class="keyword">EXPOSE</span> 5000
+
+<span class="keyword">CMD</span> [<span class="string">"python"</span>, <span class="string">"app.py"</span>]</pre></div>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #f1f5f9;">Build dan Run</h4>
+                <div class="code-block">
+                    <div class="code-header"><span><i class="fas fa-terminal"></i> Terminal</span><button onclick="copyCode(this)">Copy</button></div>
+                    <div class="code-content"><pre><span class="comment"># Build image</span>
+<span class="command">docker</span> build <span class="keyword">-t</span> flask-app:1.0 .
+
+<span class="comment"># Jalankan container</span>
+<span class="command">docker</span> run <span class="keyword">-d</span> <span class="keyword">-p</span> 5000:5000 <span class="keyword">--name</span> web-flask flask-app:1.0
+
+<span class="comment"># Cek apakah jalan</span>
+<span class="command">docker</span> ps</pre></div>
+                </div>
+
+                <div class="info-box">
+                    <h4><i class="fas fa-globe"></i> Buka Browser</h4>
+                    <p>Akses <strong>http://localhost:5000</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tasks -->
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-tasks"></i> Tugas Praktikum</h2>
+
+            <div class="task-card">
+                <h4><i class="fas fa-clipboard-check"></i> Tugas 1: Aplikasi Biodata <span class="task-points">50 poin</span></h4>
+                <p>Buat aplikasi web Flask yang menampilkan biodata Anda:</p>
+                <ol style="margin: 15px 0; padding-left: 20px;">
+                    <li>Halaman home (<code>/</code>) menampilkan: Nama, NIM, Kelas, Hobi</li>
+                    <li>Halaman about (<code>/about</code>) menampilkan deskripsi singkat tentang diri Anda</li>
+                    <li>Build menjadi Docker image dengan nama: <code>biodata-[nim]:1.0</code></li>
+                    <li>Screenshot hasilnya</li>
+                </ol>
+            </div>
+
+            <div class="task-card">
+                <h4><i class="fas fa-clipboard-check"></i> Tugas 2: Aplikasi Greeting <span class="task-points">50 poin</span></h4>
+                <p>Buat aplikasi dengan endpoint:</p>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li><code>/</code> - Halaman utama dengan instruksi</li>
+                    <li><code>/hello/&lt;nama&gt;</code> - Menampilkan "Halo, [nama]!"</li>
+                </ul>
+                <p>Contoh: Akses <code>/hello/Budi</code> → Output: "Halo, Budi!"</p>
+                <div class="info-box">
+                    <h4><i class="fas fa-lightbulb"></i> Hint</h4>
+                    <pre>@app.route('/hello/&lt;nama&gt;')
+def hello(nama):
+    return f'&lt;h1&gt;Halo, {nama}!&lt;/h1&gt;'</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer Navigation -->
+        <div class="footer-nav">
+            <a href="../pertemuan-01/index.html"><i class="fas fa-arrow-left"></i> Pertemuan 1</a>
+            <a href="../pertemuan-03/index.html">Pertemuan 3 <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block');
+            const code = codeBlock.querySelector('pre').textContent;
+            navigator.clipboard.writeText(code);
+            button.textContent = 'Copied!';
+            setTimeout(() => button.textContent = 'Copy', 2000);
+        }
+    </script>
+</body>
+</html>

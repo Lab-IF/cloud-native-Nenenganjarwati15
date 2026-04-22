@@ -1,232 +1,254 @@
-# Pertemuan 7: Pods, Deployments, dan Services
+# 🚀 Pertemuan 7: Kubernetes Deployment & Service
+
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Level](https://img.shields.io/badge/Level-Intermediate-yellow?style=for-the-badge)
+
+---
 
 ## 🎯 Tujuan Pembelajaran
 
-1. Deep dive into Pods
-2. Managing Deployments
-3. Service types dan networking
-4. Labels dan Selectors
-5. Rolling updates dan Rollbacks
+| No | Tujuan | Status |
+|----|--------|--------|
+| 1 | Memahami Kubernetes Deployment | ⬜ |
+| 2 | Menulis file YAML manifest | ⬜ |
+| 3 | Membuat Service untuk expose app | ⬜ |
+| 4 | Melakukan scaling aplikasi | ⬜ |
 
-## 📚 Teori Singkat
+---
 
-### Pod Lifecycle
+## 📚 Materi
+
+### 🔄 Apa itu Deployment?
+
+> **Deployment** = Cara mengelola Pod dengan fitur canggih!
 
 ```
-Pending → Running → Succeeded/Failed
+┌────────────────────────────────────────────────────────────────┐
+│                     DEPLOYMENT                                 │
+│                 (nginx-deployment)                             │
+│                                                                │
+│   replicas: 3  ──────────────────────────────────────────►    │
+│                                                                │
+│   ┌──────────┐   ┌──────────┐   ┌──────────┐                  │
+│   │  Pod 1   │   │  Pod 2   │   │  Pod 3   │                  │
+│   │  nginx   │   │  nginx   │   │  nginx   │                  │
+│   └──────────┘   └──────────┘   └──────────┘                  │
+│                                                                │
+│   ✅ Pod crash?     → Auto-recreate!                          │
+│   ✅ Update image?  → Rolling update (zero downtime)          │
+│   ✅ Scale up/down? → Easy dengan 1 command                   │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
 ```
 
-### Deployment Strategies
+#### 💪 Fitur Deployment:
+| Fitur | Penjelasan |
+|-------|------------|
+| **Replicas** | Menjalankan N copies dari Pod |
+| **Self-healing** | Otomatis recreate Pod yang crash |
+| **Rolling Update** | Update tanpa downtime |
+| **Rollback** | Kembali ke versi sebelumnya |
 
-1. **Rolling Update**: Gradual replacement
-2. **Recreate**: Stop all, start new
-3. **Blue-Green**: Two identical environments
-4. **Canary**: Gradual traffic shift
+---
 
-### Service Types
+### 🌐 Apa itu Service?
 
-- **ClusterIP**: Internal only (default)
-- **NodePort**: Expose on node port
-- **LoadBalancer**: Cloud load balancer
-- **ExternalName**: DNS CNAME
+> **Service** = Cara expose aplikasi agar bisa diakses
 
-## 📝 Praktikum
-
-### Multi-Container Pod
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: multi-container-pod
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    ports:
-    - containerPort: 80
-  
-  - name: log-agent
-    image: busybox
-    command: ['sh', '-c', 'tail -f /var/log/nginx/access.log']
-    volumeMounts:
-    - name: logs
-      mountPath: /var/log/nginx
-  
-  volumes:
-  - name: logs
-    emptyDir: {}
+```
+┌────────────────────────────────────────────────────────────────┐
+│                                                                │
+│      User/Browser                                              │
+│           │                                                    │
+│           ▼                                                    │
+│   ┌───────────────────────────────────────────┐               │
+│   │           SERVICE (NodePort)              │               │
+│   │          Port: 30080 → 80                 │               │
+│   └─────────────────────┬─────────────────────┘               │
+│                         │                                      │
+│          ┌──────────────┼──────────────┐                       │
+│          │              │              │                       │
+│          ▼              ▼              ▼                       │
+│     ┌────────┐    ┌────────┐    ┌────────┐                    │
+│     │ Pod 1  │    │ Pod 2  │    │ Pod 3  │                    │
+│     │ :80    │    │ :80    │    │ :80    │                    │
+│     └────────┘    └────────┘    └────────┘                    │
+│                                                                │
+│     Load Balancing otomatis! ⚖️                               │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
 ```
 
-### Deployment with Probes
+#### Tipe Service:
+| Tipe | Akses | Use Case |
+|------|-------|----------|
+| `ClusterIP` | Internal only | Antar service |
+| `NodePort` | External via Node:Port | Development |
+| `LoadBalancer` | External via LB | Production (cloud) |
 
+---
+
+## 🧪 Praktikum
+
+### 📁 Struktur:
+```
+k8s-praktik/
+├── deployment.yaml
+└── service.yaml
+```
+
+### 📄 deployment.yaml
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web-app
+  name: nginx-deployment
 spec:
-  replicas: 3
+  replicas: 3                    # Jumlah Pod
   selector:
     matchLabels:
-      app: web
+      app: nginx                 # Label selector
   template:
     metadata:
       labels:
-        app: web
-        version: v1
+        app: nginx               # Label Pod
     spec:
       containers:
-      - name: web
-        image: myapp:1.0
+      - name: nginx
+        image: nginx:latest
         ports:
-        - containerPort: 8080
-        
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 500m
-            memory: 512Mi
+        - containerPort: 80
 ```
 
-### Service Examples
-
+### 📄 service.yaml
 ```yaml
-# ClusterIP (Internal)
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-service
-spec:
-  type: ClusterIP
-  selector:
-    app: backend
-  ports:
-  - port: 8080
-    targetPort: 8080
-
----
-
-# NodePort (External Access)
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend-service
+  name: nginx-service
 spec:
   type: NodePort
   selector:
-    app: frontend
+    app: nginx                   # Match dengan Pod label
   ports:
-  - port: 80
-    targetPort: 3000
-    nodePort: 30080
-
----
-
-# LoadBalancer (Cloud)
-apiVersion: v1
-kind: Service
-metadata:
-  name: public-service
-spec:
-  type: LoadBalancer
-  selector:
-    app: web
-  ports:
-  - port: 80
-    targetPort: 8080
+  - port: 80                     # Port di cluster
+    targetPort: 80               # Port container
+    nodePort: 30080              # Port akses external
 ```
 
-### Rolling Update
+### ⌨️ Commands:
+```bash
+# 🚀 Apply Deployment
+kubectl apply -f deployment.yaml
 
+# 🌐 Apply Service
+kubectl apply -f service.yaml
+
+# 👀 Lihat resources
+kubectl get deployments
+kubectl get pods
+kubectl get services
+
+# 🔗 Akses via Minikube
+minikube service nginx-service
+```
+
+### 🧪 Test Self-Healing:
+```bash
+# Lihat pods
+kubectl get pods
+
+# Hapus salah satu pod
+kubectl delete pod [nama-pod]
+
+# Lihat lagi - Pod baru otomatis dibuat!
+kubectl get pods
+```
+
+### 📈 Test Scaling:
+```bash
+# Scale up ke 5
+kubectl scale deployment nginx-deployment --replicas=5
+kubectl get pods
+
+# Scale down ke 2
+kubectl scale deployment nginx-deployment --replicas=2
+kubectl get pods
+```
+
+### 🔄 Rolling Update:
 ```bash
 # Update image
-kubectl set image deployment/web-app web=myapp:2.0
+kubectl set image deployment/nginx-deployment nginx=nginx:alpine
 
-# Check rollout status
-kubectl rollout status deployment/web-app
+# Lihat proses
+kubectl rollout status deployment/nginx-deployment
 
-# View history
-kubectl rollout history deployment/web-app
-
-# Rollback
-kubectl rollout undo deployment/web-app
-
-# Rollback to specific revision
-kubectl rollout undo deployment/web-app --to-revision=2
+# Rollback jika bermasalah
+kubectl rollout undo deployment/nginx-deployment
 ```
-
-### Labels & Selectors
-
-```bash
-# Add label
-kubectl label pod my-pod environment=production
-
-# Filter by label
-kubectl get pods -l environment=production
-kubectl get pods -l 'environment in (production,staging)'
-
-# Remove label
-kubectl label pod my-pod environment-
-```
-
-## 💪 Tugas Praktikum
-
-### Tugas 1: Multi-Tier Application (35%)
-
-Deploy 3-tier app:
-- Frontend (React) - 3 replicas
-- Backend (API) - 5 replicas
-- Database (PostgreSQL) - 1 replica
-
-Requirements:
-- Proper service connections
-- Health checks
-- Resource limits
-- Rolling update strategy
-
-### Tugas 2: Blue-Green Deployment (25%)
-
-Implement blue-green deployment:
-- Deploy version 1 (blue)
-- Deploy version 2 (green)
-- Switch traffic from blue to green
-- Document the process
-
-### Tugas 3: Canary Release (25%)
-
-Implement canary deployment:
-- 90% traffic to stable version
-- 10% traffic to canary
-- Monitor and gradually increase
-- Rollback if issues
-
-### Tugas 4: Service Mesh Basics (15%)
-
-Explore service discovery:
-- Internal DNS resolution
-- Service-to-service communication
-- Network policies
-
-## 📚 Referensi
-
-[Kubernetes Workloads](https://kubernetes.io/docs/concepts/workloads/)
 
 ---
-**Deploy with Confidence! 🚀**
+
+## ✏️ Tugas Praktikum
+
+### 📝 Tugas: Deploy Aplikasi Flask
+
+| Kriteria | Poin |
+|----------|------|
+| Deployment dengan 3 replicas | 30 |
+| Service NodePort benar | 25 |
+| Screenshot self-healing (delete pod → auto recreate) | 25 |
+| Screenshot scaling (5 → 2 replicas) | 20 |
+| **Total** | **100** |
+
+**Gunakan image dari Docker Hub (pertemuan 5):**
+```yaml
+image: [username]/flask-app:1.0
+```
+
+---
+
+## 📤 Pengumpulan Tugas
+
+### 📁 Struktur Folder
+```
+pertemuan-07/
+├── 📄 README.md          # Materi (file ini)
+├── 📄 LAPORAN.md         # ⬅️ ISI LAPORAN DI SINI!
+└── 📁 ss/                # ⬅️ SIMPAN SCREENSHOT DI SINI!
+    ├── 01-yaml-files.png
+    ├── 02-apply-deployment.png
+    ├── 03-get-deployments.png
+    ├── 04-get-pods.png
+    ├── 05-apply-service.png
+    ├── 06-get-services.png
+    ├── 07-browser-access.png
+    ├── 08a-before-delete.png
+    ├── 08b-delete-pod.png
+    ├── 08c-after-delete.png
+    ├── 09a-scale-up.png
+    └── 09b-scale-down.png
+```
+
+### 📝 Cara Mengerjakan:
+1. **Screenshot** → Simpan di folder `ss/`
+2. **Laporan** → Edit file `LAPORAN.md`
+3. **Paste** file `deployment.yaml` dan `service.yaml`
+
+> 📋 **Template Laporan:** [Klik di sini untuk mengisi LAPORAN.md](LAPORAN.md)
+
+---
+
+## 📖 Referensi
+
+- 🔗 [Kubernetes Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
+- 🔗 [Kubernetes Services](https://kubernetes.io/docs/concepts/services-networking/service/)
+
+---
+
+<div align="center">
+
+[⬅️ Pertemuan 6](../pertemuan-06/README.md) | **📅 Pertemuan 7 dari 8** | [➡️ Pertemuan 8](../pertemuan-08/README.md)
+
+</div>
