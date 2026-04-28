@@ -1,0 +1,13 @@
+.next
+node_modules
+coverage
+.git
+.gitignore
+Dockerfile
+compose.yaml
+README.md
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env*.local

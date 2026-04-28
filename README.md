@@ -82,6 +82,39 @@ graph LR
 | **07** | [Pods, Deployments, dan Services](./pertemuan-07) | Deployments, Services, Scaling | 🟢 |
 | **08** | [UTS: Containerized Application](./pertemuan-08) | Full-stack deployment project | 🎯 |
 
+## 🧪 Contoh Implementasi: Next.js + Docker
+
+Untuk materi Docker besok, gunakan contoh siap praktik berikut:
+
+```text
+examples\nextjs-docker-app
+```
+
+Contoh ini berisi aplikasi Next.js yang punya halaman UI, API route `/api/health`, API route `/api/deployments`, environment variable, test, Dockerfile multi-stage, dan Docker Compose. Jadi mahasiswa melihat bahwa yang dimasukkan ke Docker adalah aplikasi yang punya perilaku nyata, bukan sekadar folder kosong.
+
+Jika ingin mengajar Next.js dulu sebelum Docker, buka panduan:
+
+```text
+examples\nextjs-docker-app\docs\nextjs-basics.md
+```
+
+Panduan tersebut membahas cara pakai Next.js, struktur `app`, CSS global, component, folder `lib`, API route, environment variable, public assets, dan latihan kecil.
+
+```powershell
+cd "cloud-native-practicum\examples\nextjs-docker-app"
+npm install
+npm test
+npm run build
+docker build -t nextjs-docker-app:kelas .
+docker compose up --build
+```
+
+Hubungkan dengan project DevOps/CI-CD lewat contoh pipeline:
+
+```text
+..\devops-cicd-practicum\examples\nextjs-docker-pipeline
+```
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -198,9 +231,7 @@ kubectl get nodes
 📁 cloud-native-practicum/
 ├── 📄 README.md
 ├── 📁 examples/
-│   ├── docker-samples/
-│   ├── k8s-manifests/
-│   └── compose-files/
+│   └── nextjs-docker-app/   # App Next.js untuk materi Docker & Compose
 ├── 📁 pertemuan-01/
 │   ├── 📄 README.md
 │   └── 📁 exercises/

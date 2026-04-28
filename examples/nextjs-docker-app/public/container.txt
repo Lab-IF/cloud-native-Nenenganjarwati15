@@ -1,0 +1,1 @@
+This file proves the Docker image also carries public assets.
