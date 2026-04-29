@@ -1,185 +1,275 @@
-# 📦 Pertemuan 2: Docker Images & Dockerfile
-
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Level](https://img.shields.io/badge/Level-Beginner-green?style=for-the-badge)
-
----
+# Pertemuan 2: Docker Fundamentals — Containerize Next.js
 
 ## 🎯 Tujuan Pembelajaran
 
-| No | Tujuan | Status |
-|----|--------|--------|
-| 1 | Memahami perbedaan Image dan Container | ⬜ |
-| 2 | Membuat Dockerfile sederhana | ⬜ |
-| 3 | Build custom Docker image | ⬜ |
+1. Memahami perbedaan Docker images vs containers
+2. Menguasai Docker CLI commands
+3. Membuat Dockerfile untuk Next.js
+4. Managing containers lifecycle
+5. Port mapping dan volume management
 
----
+## 📚 Teori Singkat
 
-## 📚 Materi
-
-### 🖼️ Docker Image vs Container
+### Docker Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                                                              │
-│   📄 IMAGE (Template)          📦 CONTAINER (Instance)       │
-│   ─────────────────           ──────────────────────────     │
-│   • Read-only                 • Bisa dimodifikasi            │
-│   • Blueprint/resep           • Aplikasi berjalan            │
-│   • Bisa dibagikan            • Dibuat dari image            │
-│                                                              │
-│   ┌─────────────┐             ┌─────────────┐                │
-│   │   IMAGE     │ ──────────► │ CONTAINER 1 │                │
-│   │  nginx:1.0  │    docker   ├─────────────┤                │
-│   └─────────────┘     run     │ CONTAINER 2 │                │
-│                               ├─────────────┤                │
-│         1 Image       ──►     │ CONTAINER 3 │                │
-│                               └─────────────┘                │
-│                                 N Containers                 │
-└──────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────┐
+│       Docker Client (CLI)        │
+└────────────┬─────────────────────┘
+             │
+┌────────────▼─────────────────────┐
+│       Docker Daemon              │
+│  ┌──────────────────────────┐   │
+│  │   Container Runtime      │   │
+│  └──────────────────────────┘   │
+└──────────────────────────────────┘
+             │
+┌────────────▼─────────────────────┐
+│       Host OS Kernel             │
+└──────────────────────────────────┘
 ```
 
-> 💡 **Analogi:** Image = Resep Kue 📝 | Container = Kue yang sudah jadi 🎂
+### Images vs Containers
 
----
+**Image:**
+- Read-only template
+- Contains application code + dependencies
+- Layered filesystem
+- Stored in registry
 
-### 📝 Dockerfile
+**Container:**
+- Running instance of image
+- Writable layer on top
+- Isolated process
+- Ephemeral (bisa dihapus dan dibuat ulang)
 
-Dockerfile adalah file teks berisi **instruksi langkah-langkah** untuk membuat Docker Image.
+### Docker Lifecycle
 
-#### Instruksi Dasar:
+```
+docker pull  → docker create → docker start → docker stop → docker rm
+                                    ↓
+                              docker run (create + start)
+```
 
-| Instruksi | Fungsi | Contoh |
-|-----------|--------|--------|
-| `FROM` | Base image | `FROM python:3.11` |
-| `WORKDIR` | Set working directory | `WORKDIR /app` |
-| `COPY` | Copy file dari host | `COPY . /app` |
-| `RUN` | Jalankan command saat build | `RUN pip install flask` |
-| `CMD` | Command default saat run | `CMD ["python", "app.py"]` |
-| `EXPOSE` | Dokumentasi port | `EXPOSE 5000` |
+## 📝 Praktikum
 
-#### 📄 Contoh Dockerfile:
+### Langkah 1: Basic Docker Commands
+
+```bash
+# Pull image
+docker pull node:20-alpine
+docker pull nginx:latest
+
+# List images
+docker images
+
+# Run container
+docker run node:20-alpine node -e "console.log('Hello Docker')"
+docker run -it node:20-alpine sh    # Interactive
+docker run -d nginx                 # Detached
+
+# List containers
+docker ps       # Running only
+docker ps -a    # All
+
+# Container management
+docker stop <container-id>
+docker start <container-id>
+docker restart <container-id>
+docker rm <container-id>
+
+# Image management
+docker rmi <image-id>
+docker image prune  # Remove unused
+```
+
+### Langkah 2: Dockerfile Sederhana untuk Next.js
+
+Di Pertemuan 1, kita menjalankan Next.js secara lokal. Sekarang kita akan memasukkannya ke dalam container Docker.
+
+Buat Dockerfile sederhana (versi dasar, belum dioptimasi):
 
 ```dockerfile
-# 🐍 Base image Python
-FROM python:3.11-slim
+# Dockerfile.simple
+FROM node:20-alpine
 
-# 📁 Set working directory
 WORKDIR /app
 
-# 📋 Copy file aplikasi
-COPY app.py .
+COPY package*.json ./
+RUN npm ci
 
-# 🚀 Command untuk menjalankan aplikasi
-CMD ["python", "app.py"]
+COPY . .
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
 ```
 
----
+**Penjelasan setiap instruksi:**
 
-### ⌨️ Perintah Build & Run
+| Instruksi | Fungsi |
+|-----------|--------|
+| `FROM node:20-alpine` | Base image — Node.js versi 20 di atas Alpine Linux |
+| `WORKDIR /app` | Set working directory di dalam container |
+| `COPY package*.json ./` | Copy file dependency terlebih dahulu |
+| `RUN npm ci` | Install dependency (repeatable, exact versions) |
+| `COPY . .` | Copy seluruh source code |
+| `RUN npm run build` | Build Next.js untuk production |
+| `EXPOSE 3000` | Dokumentasi port yang dipakai |
+| `CMD ["npm", "start"]` | Command default saat container dijalankan |
+
+### Langkah 3: Build dan Run Next.js Container
 
 ```bash
-# 🔨 Build image dari Dockerfile
-docker build -t nama-image:tag .
+# Masuk ke folder project
+cd cloud-native-practicum/examples/nextjs-docker-app
 
-# Penjelasan:
-#   -t          = tag/nama untuk image
-#   nama:tag    = format nama image
-#   .           = lokasi Dockerfile (current dir)
+# Build image
+docker build -t nextjs-app:v1 .
 
-# 🚀 Jalankan container dari image
-docker run nama-image:tag
+# Cek image yang dibuat
+docker images | grep nextjs
 
-# 🗑️ Hapus image
-docker rmi nama-image:tag
+# Run container
+docker run -d -p 3000:3000 --name nextjs-dev nextjs-app:v1
+
+# Cek container berjalan
+docker ps
+
+# Buka browser: http://localhost:3000
 ```
 
----
+### Langkah 4: Inspect Container
 
-## 🧪 Praktikum
-
-### Step 1: Buat Folder Project
 ```bash
-mkdir docker-python
-cd docker-python
+# View logs
+docker logs nextjs-dev
+docker logs -f nextjs-dev  # Follow (real-time)
+
+# Execute command di dalam container
+docker exec -it nextjs-dev sh
+
+# Di dalam container, coba:
+ls -la
+cat package.json
+node -v
+exit
+
+# Inspect container details
+docker inspect nextjs-dev
+
+# Lihat resource usage
+docker stats nextjs-dev --no-stream
 ```
 
-### Step 2: Buat File `app.py`
-```python
-# app.py
-print("=" * 40)
-print("🐳 Hello from Docker!")
-print("Nama  : [Ganti dengan nama Anda]")
-print("NIM   : [Ganti dengan NIM Anda]")
-print("=" * 40)
-```
+### Langkah 5: Environment Variable di Docker
 
-### Step 3: Buat File `Dockerfile`
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY app.py .
-CMD ["python", "app.py"]
-```
-
-### Step 4: Build & Run
 ```bash
-# Build
-docker build -t biodata-app:1.0 .
+# Run dengan environment variable
+docker run -d -p 3000:3000 \
+  -e APP_ENV=docker \
+  -e NEXT_PUBLIC_APP_MESSAGE="Halo dari Docker container!" \
+  --name nextjs-env nextjs-app:v1
 
-# Run
-docker run biodata-app:1.0
+# Cek env variable lewat API health
+curl http://localhost:3000/api/health
 ```
 
----
+Perhatikan bahwa `APP_ENV` dan `NEXT_PUBLIC_APP_MESSAGE` berubah di response API dan UI.
 
-## ✏️ Tugas Praktikum
+### Langkah 6: Port Mapping & Volumes
 
-### 📝 Tugas: Aplikasi Biodata
+```bash
+# Port mapping — host:container
+docker run -d -p 8080:3000 nextjs-app:v1    # Akses di port 8080
+docker run -d -p 3001:3000 nextjs-app:v1    # Akses di port 3001
 
-| Kriteria | Poin |
-|----------|------|
-| Aplikasi menampilkan Nama, NIM, Kelas | 40 |
-| Dockerfile benar | 30 |
-| Build berhasil | 20 |
-| Screenshot lengkap | 10 |
-| **Total** | **100** |
+# Volume mounting (untuk development)
+docker run -v $(pwd)/public:/app/public nginx
 
----
-
-## 📤 Pengumpulan Tugas
-
-### 📁 Struktur Folder
-```
-pertemuan-02/
-├── 📄 README.md          # Materi (file ini)
-├── 📄 LAPORAN.md         # ⬅️ ISI LAPORAN DI SINI!
-└── 📁 ss/                # ⬅️ SIMPAN SCREENSHOT DI SINI!
-    ├── 01-struktur-folder.png
-    ├── 02-docker-build.png
-    ├── 03-docker-images.png
-    └── 04-docker-run.png
+# Named volumes
+docker volume create app-data
+docker volume ls
+docker volume inspect app-data
 ```
 
-### 📝 Cara Mengerjakan:
-1. **Screenshot** → Simpan di folder `ss/`
-2. **Laporan** → Edit file `LAPORAN.md`
-3. **Paste kode** `app.py` dan `Dockerfile` di laporan
+### Langkah 7: Perhatikan Ukuran Image
 
-> 📋 **Template Laporan:** [Klik di sini untuk mengisi LAPORAN.md](LAPORAN.md)
+```bash
+# Cek ukuran image yang kita buat
+docker images nextjs-app
+
+# Bandingkan dengan base image
+docker images node:20-alpine
+```
+
+> 💡 **Catatan:** Image dari Dockerfile sederhana ini akan berukuran **~1GB** karena menyertakan seluruh `node_modules`, source code, dan build artifacts. Di **Pertemuan 3**, kita akan mengoptimasi ini menggunakan multi-stage build menjadi **~200MB**.
+
+### Langkah 8: Cleanup
+
+```bash
+# Stop dan remove container
+docker stop nextjs-dev nextjs-env
+docker rm nextjs-dev nextjs-env
+
+# Remove image (opsional)
+docker rmi nextjs-app:v1
+
+# Bersihkan semua yang tidak dipakai
+docker system prune
+```
+
+## 💪 Tugas Praktikum
+
+### Tugas 1: Docker Commands Mastery (20 poin)
+
+1. Praktikkan semua basic commands dari langkah 1
+2. Buat cheatsheet Docker commands (minimal 15 commands)
+3. Screenshot setiap langkah
+
+### Tugas 2: Containerize Next.js App (30 poin)
+
+1. Build image Next.js dari `../examples/nextjs-docker-app`
+2. Jalankan container dan akses di browser
+3. Screenshot halaman utama dan `/api/health` dari container
+4. Jalankan container dengan environment variable berbeda:
+   - `APP_ENV=production`
+   - `NEXT_PUBLIC_APP_MESSAGE="[Nama Anda] - [NIM]"`
+5. Screenshot perubahan di UI dan API response
+
+### Tugas 3: Persistent Data dengan Volume (25 poin)
+
+1. Jalankan PostgreSQL container dengan named volume:
+   ```bash
+   docker run -d --name postgres-lab \
+     -e POSTGRES_PASSWORD=secret \
+     -v pgdata:/var/lib/postgresql/data \
+     -p 5432:5432 \
+     postgres:16-alpine
+   ```
+2. Buat database dan tabel sederhana
+3. Stop dan remove container, lalu buat ulang dengan volume yang sama
+4. Buktikan data masih ada (screenshot)
+
+### Tugas 4: Container Networking (25 poin)
+
+1. Buat Docker network:
+   ```bash
+   docker network create lab-network
+   ```
+2. Jalankan Next.js container dan PostgreSQL di network yang sama
+3. Buktikan container bisa saling berkomunikasi
+4. Dokumentasikan langkah-langkah yang dilakukan
+
+## 📚 Referensi
+
+1. [Docker Get Started](https://docs.docker.com/get-started/)
+2. [Dockerfile Reference](https://docs.docker.com/reference/dockerfile/)
+3. [Next.js Deployment](https://nextjs.org/docs/deployment)
 
 ---
 
-## 📖 Referensi
+**Master Docker! 🐳**
 
-- 🔗 [Dockerfile Reference](https://docs.docker.com/engine/reference/builder/)
-- 🔗 [Best Practices Dockerfile](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
-
----
-
-<div align="center">
-
-[⬅️ Pertemuan 1](../pertemuan-01/README.md) | **📅 Pertemuan 2 dari 8** | [➡️ Pertemuan 3](../pertemuan-03/README.md)
-
-</div>
+Sekarang aplikasi Next.js dari Pertemuan 1 sudah bisa berjalan di dalam container. Di Pertemuan 3, kita akan mengoptimasi Dockerfile agar image lebih kecil dan aman.

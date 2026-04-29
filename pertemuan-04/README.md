@@ -1,214 +1,334 @@
-# 🎼 Pertemuan 4: Docker Compose
-
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Compose](https://img.shields.io/badge/Docker%20Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Level](https://img.shields.io/badge/Level-Intermediate-yellow?style=for-the-badge)
-
----
+# Pertemuan 4: Docker Compose — Next.js + Database
 
 ## 🎯 Tujuan Pembelajaran
 
-| No | Tujuan | Status |
-|----|--------|--------|
-| 1 | Memahami kegunaan Docker Compose | ⬜ |
-| 2 | Menulis file docker-compose.yml | ⬜ |
-| 3 | Menjalankan multi-container apps | ⬜ |
-| 4 | Menghubungkan antar container | ⬜ |
+1. Menguasai Docker Compose untuk orchestrate multiple services
+2. Menghubungkan Next.js dengan database
+3. Network dan volume management
+4. Environment variables dan service dependencies
+5. Healthcheck dan monitoring
 
----
+## 📚 Teori Singkat
 
-## 📚 Materi
+### Docker Compose
 
-### 🤔 Kenapa Docker Compose?
+Docker Compose memungkinkan kita mendefinisikan dan menjalankan multi-container application dengan satu file konfigurasi `compose.yaml`.
 
+### Commands Penting
+
+```bash
+# Start semua services
+docker compose up -d
+
+# Start dengan rebuild image
+docker compose up --build
+
+# View logs
+docker compose logs -f
+docker compose logs web    # Log service tertentu
+
+# Stop services
+docker compose down
+
+# Stop dan hapus volumes
+docker compose down -v
+
+# Scale service
+docker compose up -d --scale web=3
+
+# Lihat status services
+docker compose ps
 ```
-┌────────────────────────────────────────────────────────────┐
-│           😓 TANPA DOCKER COMPOSE                          │
-│                                                            │
-│  $ docker run -d --name db mysql...                       │
-│  $ docker run -d --name backend --link db...              │
-│  $ docker run -d --name frontend -p 80:80...              │
-│  $ docker run ... (dan seterusnya 😵)                     │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
-                        VS
-┌────────────────────────────────────────────────────────────┐
-│           🎉 DENGAN DOCKER COMPOSE                         │
-│                                                            │
-│  $ docker-compose up -d                                   │
-│                                                            │
-│  ✨ Selesai! Semua container jalan!                       │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
-```
 
-> 💡 **Docker Compose** = Satu file untuk mengatur semua container!
+## 📝 Praktikum
 
----
+### Langkah 1: Compose yang Sudah Ada
 
-### 📄 Struktur docker-compose.yml
+Buka `../examples/nextjs-docker-app/compose.yaml`:
 
 ```yaml
-version: '3.8'              # Versi format file
-
-services:                   # Daftar container/services
-  web:                      # Nama service
-    image: nginx            # Image yang digunakan
-    ports:
-      - "8080:80"           # Port mapping
-  
-  database:
-    image: mysql:8.0
-    environment:            # Environment variables
-      MYSQL_ROOT_PASSWORD: secret
-    volumes:                # Volume untuk data
-      - db-data:/var/lib/mysql
-
-volumes:                    # Deklarasi volumes
-  db-data:
-```
-
-#### 🔑 Keywords Penting:
-
-| Keyword | Fungsi |
-|---------|--------|
-| `image` | Image Docker yang digunakan |
-| `build` | Build dari Dockerfile |
-| `ports` | Port mapping |
-| `environment` | Environment variables |
-| `volumes` | Mount volumes |
-| `depends_on` | Dependency antar service |
-
----
-
-### ⌨️ Perintah Docker Compose
-
-| Perintah | Fungsi |
-|----------|--------|
-| `docker-compose up` | Jalankan semua services |
-| `docker-compose up -d` | Jalankan di background |
-| `docker-compose up --build` | Build ulang lalu jalankan |
-| `docker-compose down` | Stop & hapus containers |
-| `docker-compose down -v` | Stop & hapus + volumes |
-| `docker-compose ps` | Lihat status services |
-| `docker-compose logs` | Lihat logs |
-| `docker-compose logs -f` | Follow logs realtime |
-
----
-
-## 🧪 Praktikum
-
-### 📁 Struktur Folder:
-```
-flask-mysql/
-├── docker-compose.yml
-├── init.sql
-└── app/
-    ├── Dockerfile
-    ├── requirements.txt
-    └── app.py
-```
-
-### 📄 docker-compose.yml
-```yaml
-version: '3.8'
-
 services:
-  database:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: rahasia
-      MYSQL_DATABASE: myapp
-    volumes:
-      - db-data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-
-  web:
-    build: ./app
+  app:
+    build:
+      context: .
+    image: nextjs-docker-app:kelas
     ports:
-      - "5000:5000"
+      - "3000:3000"
     environment:
-      DB_HOST: database
-      DB_USER: root
-      DB_PASSWORD: rahasia
-      DB_NAME: myapp
+      NODE_ENV: production
+      APP_ENV: compose
+      APP_VERSION: "0.1.0"
+      NEXT_PUBLIC_APP_MESSAGE: "Berjalan lewat Compose – env var berhasil masuk."
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+```
+
+Jalankan:
+
+```powershell
+cd "cloud-native-practicum\examples\nextjs-docker-app"
+docker compose up --build
+```
+
+| Fitur Compose | Implementasi |
+|---------------|--------------|
+| `build.context` | Build image dari Dockerfile Next.js |
+| `image` | Nama image yang dihasilkan |
+| `ports` | Publish container port 3000 ke host |
+| `environment` | Mengubah pesan UI dan metadata `/api/health` |
+| `healthcheck` | Memastikan aplikasi responsif, bukan hanya proses hidup |
+
+### Langkah 2: Next.js + PostgreSQL
+
+Sekarang kita tambahkan database. Buat file `compose-fullstack.yaml`:
+
+```yaml
+services:
+  web:
+    build: ../examples/nextjs-docker-app
+    ports:
+      - "3000:3000"
+    environment:
+      APP_ENV: compose
+      APP_VERSION: "0.2.0"
+      NEXT_PUBLIC_APP_MESSAGE: "Next.js + PostgreSQL via Compose"
+      DATABASE_URL: postgresql://user:pass@db:5432/practicum
     depends_on:
-      - database
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: practicum
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d practicum"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
 volumes:
-  db-data:
+  pgdata:
 ```
 
-### 🚀 Menjalankan:
+### Penjelasan Detail
+
+#### `depends_on` dengan `condition`
+
+```yaml
+depends_on:
+  db:
+    condition: service_healthy
+```
+
+Next.js **tidak akan start** sampai PostgreSQL health check berhasil. Ini mencegah error koneksi database saat startup.
+
+#### Healthcheck
+
+```yaml
+# Next.js healthcheck — cek API endpoint
+healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+  interval: 10s
+  timeout: 5s
+  retries: 3
+
+# PostgreSQL healthcheck — cek database ready
+healthcheck:
+  test: ["CMD-SHELL", "pg_isready -U user -d practicum"]
+  interval: 5s
+  timeout: 3s
+  retries: 5
+```
+
+| Parameter | Fungsi |
+|-----------|--------|
+| `test` | Command yang dijalankan untuk cek kesehatan |
+| `interval` | Jeda antar pengecekan |
+| `timeout` | Batas waktu per pengecekan |
+| `retries` | Berapa kali gagal sebelum dianggap unhealthy |
+| `start_period` | Waktu tunggu awal sebelum mulai cek |
+
+#### Volumes
+
+```yaml
+volumes:
+  pgdata:
+```
+
+Named volume `pgdata` menyimpan data PostgreSQL. Data **tetap ada** meskipun container dihapus.
+
 ```bash
-# Build dan jalankan
-docker-compose up -d --build
+# Data tetap ada setelah restart
+docker compose down
+docker compose up -d
+# Data PostgreSQL masih ada!
 
-# Cek status
-docker-compose ps
+# Data dihapus hanya jika pakai flag -v
+docker compose down -v
+```
 
-# Lihat logs
-docker-compose logs -f web
+#### Networks
+
+Docker Compose otomatis membuat network untuk semua services. Service bisa saling akses menggunakan nama service sebagai hostname:
+
+```
+web → db:5432  (PostgreSQL)
+web → redis:6379  (Redis, jika ada)
+```
+
+### Langkah 3: Tambah Redis (Cache)
+
+Extend compose dengan Redis:
+
+```yaml
+services:
+  web:
+    build: ../examples/nextjs-docker-app
+    ports:
+      - "3000:3000"
+    environment:
+      APP_ENV: compose
+      DATABASE_URL: postgresql://user:pass@db:5432/practicum
+      REDIS_URL: redis://cache:6379
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: practicum
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d practicum"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  cache:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
+  redis-data:
+```
+
+### Langkah 4: Compose Commands Lengkap
+
+```bash
+# Start semua services di background
+docker compose -f compose-fullstack.yaml up -d
+
+# Lihat status dan healthcheck
+docker compose -f compose-fullstack.yaml ps
+
+# Lihat logs Next.js saja
+docker compose -f compose-fullstack.yaml logs web
+
+# Masuk ke container PostgreSQL
+docker compose -f compose-fullstack.yaml exec db psql -U user -d practicum
+
+# Restart satu service
+docker compose -f compose-fullstack.yaml restart web
 
 # Stop semua
-docker-compose down
+docker compose -f compose-fullstack.yaml down
 ```
 
+## 💪 Tugas Praktikum
+
+### Tugas 1: Jalankan Compose Next.js (20 poin)
+
+1. Jalankan `compose.yaml` dari `../examples/nextjs-docker-app`
+2. Screenshot:
+   - Halaman utama di browser
+   - Output `docker compose ps` (perhatikan status healthcheck)
+   - Response `/api/health` — perhatikan `APP_ENV: compose`
+3. Ubah `NEXT_PUBLIC_APP_MESSAGE` di compose, rebuild, screenshot perubahan
+
+### Tugas 2: Next.js + PostgreSQL (35 poin)
+
+1. Buat `compose-fullstack.yaml` dengan Next.js + PostgreSQL
+2. Jalankan dan verifikasi:
+   - Next.js bisa diakses di browser
+   - PostgreSQL berjalan dan healthy
+   - `depends_on` bekerja (Next.js menunggu DB siap)
+3. Masuk ke container PostgreSQL dan buat tabel sederhana:
+   ```sql
+   CREATE TABLE students (
+     id SERIAL PRIMARY KEY,
+     nim VARCHAR(20),
+     nama VARCHAR(100)
+   );
+   INSERT INTO students (nim, nama) VALUES ('12345', 'Nama Anda');
+   ```
+4. Stop dan restart compose — buktikan data masih ada (volume persistent)
+5. Screenshot semua langkah
+
+### Tugas 3: Extend dengan Redis (25 poin)
+
+1. Tambahkan Redis ke compose dari Tugas 2
+2. Verifikasi Redis berjalan:
+   ```bash
+   docker compose exec cache redis-cli ping
+   ```
+3. Set dan get value di Redis:
+   ```bash
+   docker compose exec cache redis-cli SET greeting "Hello from Redis"
+   docker compose exec cache redis-cli GET greeting
+   ```
+4. Screenshot dan dokumentasikan
+
+### Tugas 4: Monitoring dengan Compose (20 poin)
+
+1. Tambahkan Adminer (database web UI) ke compose:
+   ```yaml
+   adminer:
+     image: adminer
+     ports:
+       - "8080:8080"
+     depends_on:
+       - db
+   ```
+2. Akses Adminer di `http://localhost:8080`
+3. Login ke PostgreSQL lewat Adminer
+4. Screenshot dan dokumentasikan arsitektur lengkap
+
+## 📚 Referensi
+
+1. [Docker Compose Documentation](https://docs.docker.com/compose/)
+2. [Compose File Reference](https://docs.docker.com/reference/compose-file/)
+3. [PostgreSQL Docker Image](https://hub.docker.com/_/postgres)
+4. [Redis Docker Image](https://hub.docker.com/_/redis)
+
 ---
 
-## ✏️ Tugas Praktikum
+**Compose It! 🎼**
 
-### 📝 Tugas: Aplikasi Todo List
-
-| Kriteria | Poin |
-|----------|------|
-| docker-compose.yml benar | 30 |
-| Flask + MySQL terhubung | 30 |
-| Bisa Create & Read todo | 25 |
-| Volume untuk database | 15 |
-| **Total** | **100** |
-
-**Fitur Minimum:**
-- Tampilkan semua todos (`/`)
-- Tambah todo (`/add`)
-- Hapus todo (`/delete/<id>`)
-
----
-
-## 📤 Pengumpulan Tugas
-
-### 📁 Struktur Folder
-```
-pertemuan-04/
-├── 📄 README.md          # Materi (file ini)
-├── 📄 LAPORAN.md         # ⬅️ ISI LAPORAN DI SINI!
-└── 📁 ss/                # ⬅️ SIMPAN SCREENSHOT DI SINI!
-    ├── 01-struktur-folder.png
-    ├── 02-compose-up.png
-    ├── 03-compose-ps.png
-    ├── 04-browser.png
-    ├── 05-compose-logs.png
-    └── 06-fitur-crud.png
-```
-
-### 📝 Cara Mengerjakan:
-1. **Screenshot** → Simpan di folder `ss/`
-2. **Laporan** → Edit file `LAPORAN.md`
-3. **Paste kode** `docker-compose.yml`, `app.py`, dll
-
-> 📋 **Template Laporan:** [Klik di sini untuk mengisi LAPORAN.md](LAPORAN.md)
-
----
-
-## 📖 Referensi
-
-- 🔗 [Docker Compose Documentation](https://docs.docker.com/compose/)
-- 🔗 [Compose File Reference](https://docs.docker.com/compose/compose-file/)
-
----
-
-<div align="center">
-
-[⬅️ Pertemuan 3](../pertemuan-03/README.md) | **📅 Pertemuan 4 dari 8** | [➡️ Pertemuan 5](../pertemuan-05/README.md)
-
-</div>
+Sekarang Next.js bisa berjalan bersama database dan cache dalam satu perintah. Di Pertemuan 5, kita akan push image ke Container Registry.
